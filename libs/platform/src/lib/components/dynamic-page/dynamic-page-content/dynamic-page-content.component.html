@@ -1,0 +1,39 @@
+<!-- <ng-container *ngTemplateOutlet="mobile ? mobileTemplate : desktopTemplate"></ng-container> -->
+
+<ng-container *ngIf="tabLabel; else default">
+    <div class="fd-dynamic-page__tabs--overflow">
+        <ul
+            class="fd-tabs fd-tabs--l fd-dynamic-page__tabs fd-dynamic-page__tabs--xl fd-dynamic-page__tabs--add-shadow"
+            role="tablist"
+        >
+            <li role="listitem" class="fd-tabs__item">
+                <a class="fd-tabs__link" aria-controls="fuCwV550" aria-selected="true" href="#fuCwV550" role="tab">
+                    <span class="fd-tabs__tag">
+                        {{ tabLabel }}
+                    </span>
+                </a>
+            </li>
+            <li role="listitem" class="fd-tabs__item">
+                <a class="fd-tabs__link" aria-controls="AiWfz165" href="#AiWfz165" role="tab">
+                    <span class="fd-tabs__tag">
+                        Selected
+                    </span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="fd-dynamic-page__content fd-dynamic-page__content--xl">
+        <div class="fd-tabs__panel" aria-expanded="true" id="fuCwV550" role="tabpanel">
+            <ng-content></ng-content>
+        </div>
+        <div class="fd-tabs__panel" aria-expanded="false" id="AiWfz165" role="tabpanel">
+            Dolor sit Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius assumenda, quidem natus optio
+            repudiandae deleniti in atque quis, sed cum asperiores minus rerum incidunt unde quod fuga amet ea
+            reprehenderit. Dolor sit Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius assumenda, quidem
+            natus optio repudiandae deleniti in atque quis, sed cu
+        </div>
+    </div>
+</ng-container>
+<ng-template #default>
+    <!-- <ng-content></ng-content> -->
+</ng-template>

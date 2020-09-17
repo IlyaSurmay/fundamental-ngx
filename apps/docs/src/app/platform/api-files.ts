@@ -9,6 +9,7 @@ export const API_FILES = {
     button: ['ButtonComponent'],
     checkbox: ['CheckboxComponent'],
     checkboxGroup: ['CheckboxGroupComponent'],
+    dynamicPage: ['DynamicPageComponent'],
     infoLabel: ['InfoLabelComponent'],
     input: ['InputComponent'],
     link: ['LinkComponent'],
@@ -31,5 +32,5 @@ export const API_FILES = {
     inputGroup: ['InputGroupConfig', 'InputGroupComponent', 'InputGroupAddonComponent', 'InputGroupInputComponent'],
     combobox: ['ComboboxComponent', 'BaseCombobox', 'ComboboxConfig'],
     list: ['ListComponent', 'StandardListItemComponent', 'ListFooter', 'ListGroupHeader', 'ListConfig'],
-    standardlistitem: ['ListComponent', 'StandardListItemComponent', 'ListFooter', 'ListGroupHeader', 'ListConfig'],
+    standardlistitem: ['ListComponent', 'StandardListItemComponent', 'ListFooter', 'ListGroupHeader', 'ListConfig']
 };
