@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 
 import { CLASS_NAME } from '../../constants';
+import { DynamicPageService } from '../../dynamic-page.service';
 
 @Component({
     selector: 'fdp-dynamic-page-title',
@@ -23,8 +24,23 @@ export class DynamicPageTitleComponent implements OnInit {
     @Input()
     subtitle: string;
 
+    // toggledVal = false;
+    // @ViewChild(DynamicPageHeaderComponent)
+    // private headerComponent: DynamicPageHeaderComponent;
+
     /** @hidden */
-    constructor(private _elementRef: ElementRef<HTMLElement>, private _renderer: Renderer2) {}
+    constructor(private _elementRef: ElementRef<HTMLElement>, private _renderer: Renderer2) {
+        // this._dynamicPageService.$toggle.subscribe((val) => {
+        //     console.log('subscriibied to dyn page serviicee in content' + val);
+        //     this.toggledVal = val;
+        // });
+    }
+
+    // toggleCollapse(): any {
+    //     console.log('ini tiitle');
+
+    //     this.headerComponent.toggleCollapse();
+    // }
 
     /** @hidden */
     ngOnInit(): void {

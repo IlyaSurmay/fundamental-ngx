@@ -10,6 +10,8 @@ import { DynamicPageGlobalActionsComponent } from './dynamic-page-header/actions
 import { DynamicPageLayoutActionsComponent } from './dynamic-page-header/actions/layout-actions/dynamic-page-layout-actions.component';
 import { DynamicPageHeaderComponent } from './dynamic-page-header/header/dynamic-page-header.component';
 import { DynamicPageFooterComponent } from './dynamic-page-footer/dynamic-page-footer.component';
+import { TabsModule } from '@fundamental-ngx/core';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 @NgModule({
     declarations: [
@@ -23,7 +25,7 @@ import { DynamicPageFooterComponent } from './dynamic-page-footer/dynamic-page-f
         DynamicPageContentComponent,
         DynamicPageFooterComponent
     ],
-    imports: [CommonModule],
+    imports: [CommonModule, TabsModule, ScrollingModule],
     exports: [
         DynamicPageComponent,
         DynamicPageTitleComponent,

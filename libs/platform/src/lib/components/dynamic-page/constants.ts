@@ -16,9 +16,10 @@ export const CLASS_NAME = {
     dynamicPageHeader: 'fd-dynamic-page__header',
     dynamicPageHeaderExtraLarge: 'fd-dynamic-page__header--xl',
     dynamicPageTabs: 'fd-dynamic-page__tabs',
+    dynamicPageTabsAddShadow: 'fd-dynamic-page__tabs--add-shadow',
+    dynamicPageTabsExtraLarge: 'fd-dynamic-page__tabs--xl',
     dynamicPageContent: 'fd-dynamic-page__content',
     dynamicPageContentExtraLarge: 'fd-dynamic-page__content--xl'
-    // dynamicPageFooter: 'fd-dynamicPage__footer'
 } as const;
 
 export const DYNAMIC_PAGE_CHILD_TOKEN = new InjectionToken<string>('DYNAMIC_PAGE_CHILD_TOKEN');

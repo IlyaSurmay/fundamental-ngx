@@ -1,16 +1,24 @@
-<div class="fd-dynamic-page__header fd-dynamic-page__header--xl" role="region" aria-label="Dynamic Page Desktop Header">
+<div
+    class="fd-dynamic-page__header fd-dynamic-page__header--xl"
+    role="region"
+    aria-label="Dynamic Page Desktop Header"
+    *ngIf="!collapsed"
+    id="fddplhvc1"
+    #headerContent
+>
     <ng-content></ng-content>
 </div>
-<div class="fd-dynamic-page__header-visibility-container fd-dynamic-page__header-visibility-container--no-shadow">
+<div class="fd-dynamic-page__header-visibility-container">
     <div class="fd-dynamic-page__header-visibility-container--left-gradient"></div>
     <div class="fd-dynamic-page__header-visibility-container--button-group">
         <button
             class="fd-dynamic-page__collapse-button fd-button fd-button--compact"
             aria-label="See More"
-            aria-expanded="false"
+            [attr.aria-expanded]="!collapsed"
             aria-haspopup="true"
             aria-controls="fddplhvc1"
             *ngIf="collapsible"
+            (click)="toggleCollapse()"
         >
             <i class="sap-icon--slim-arrow-up"></i>
         </button>

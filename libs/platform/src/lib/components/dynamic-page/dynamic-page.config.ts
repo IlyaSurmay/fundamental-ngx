@@ -11,12 +11,12 @@ export class DynamicPageConfig {
     /**
      * ARIA label for button when the Dynamic Page is collapsed
      */
-    // expandLabel = 'Expand Panel';
+    expandLabel = 'Expand Header';
 
     /**
      * ARIA label for button when the Panel is expanded
      */
-    // collapseLabel = 'Collapse Panel';
+    collapseLabel = 'Collapse Header';
 
     /**
      * Content Density of element. 'cozy' | 'compact'

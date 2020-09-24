@@ -9,7 +9,9 @@ import { SharedDocumentationPageModule } from '../../../documentation/shared-doc
 import { PlatformDynamicPageHeaderComponent } from './platform-dynamic-page-header/platform-dynamic-page-header.component';
 import { PlatformDynamicPageDocsComponent } from './platform-dynamic-page-docs.component';
 import { PlatformDynamicPageExampleComponent } from './platform-dynamic-page-examples/platform-dynamic-page-example.component';
-import { BreadcrumbModule, ToolbarModule } from '@fundamental-ngx/core';
+import { BreadcrumbModule, ToolbarModule, BarModule } from '@fundamental-ngx/core';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import { PlatformDynamicPageTabbedComponent } from './platform-dynamic-page-examples/platform-dynamic-page-tabbed.component';
 
 const routes: Routes = [
     {
@@ -29,13 +31,16 @@ const routes: Routes = [
         PlatformDynamicPageModule,
         BreadcrumbModule,
         ToolbarModule,
-        PlatformButtonModule
+        PlatformButtonModule,
+        BarModule,
+        ScrollingModule
     ],
     exports: [RouterModule],
     declarations: [
         PlatformDynamicPageDocsComponent,
         PlatformDynamicPageHeaderComponent,
-        PlatformDynamicPageExampleComponent
+        PlatformDynamicPageExampleComponent,
+        PlatformDynamicPageTabbedComponent
     ]
 })
 export class PlatformDynamicPageDocsModule {}

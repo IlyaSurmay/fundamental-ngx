@@ -6,6 +6,6 @@ import { Component } from '@angular/core';
 })
 export class PlatformDynamicPageExampleComponent {
     onCollapseChange(event: Event): any {
-        alert('collapse changed');
+        console.log('collapse changed');
     }
 }
