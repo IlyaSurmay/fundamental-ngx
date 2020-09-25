@@ -8,7 +8,7 @@
 >
     <ng-content></ng-content>
 </div>
-<div class="fd-dynamic-page__header-visibility-container">
+<div class="fd-dynamic-page__header-visibility-container" *ngIf="collapsible || pinnable">
     <div class="fd-dynamic-page__header-visibility-container--left-gradient"></div>
     <div class="fd-dynamic-page__header-visibility-container--button-group">
         <button
@@ -17,15 +17,31 @@
             [attr.aria-expanded]="!collapsed"
             aria-haspopup="true"
             aria-controls="fddplhvc1"
-            *ngIf="collapsible"
+            *ngIf="collapsible && !pinned"
             (click)="toggleCollapse()"
         >
             <i *ngIf="!collapsed" class="sap-icon--slim-arrow-up"></i>
             <i *ngIf="collapsed" class="sap-icon--slim-arrow-down"></i>
         </button>
-        <button class="fd-dynamic-page__pin-button fd-button fd-button--compact" aria-label="Pin this" *ngIf="pinnable">
+        <button
+            class="fd-dynamic-page__pin-button fd-button fd-button--compact"
+            aria-label="Pin this"
+            [attr.aria-selected]="pinned"
+            (click)="onPinned()"
+            *ngIf="pinnable"
+            #pinBtn
+        >
             <i class="sap-icon--pushpin-off"></i>
         </button>
+        <!-- <fdp-button
+            [buttonType]="'emphasized'"
+            [glyph]="'pushpin-off'"
+            title="Pinnable"
+            contentDensity="compact"
+            [ariaSelected]="pinnable"
+            *ngIf="pinnable"
+        ></fdp-button> -->
+        <!-- something wrong with glyph on buttons. come back to this later TODO -->
     </div>
     <div class="fd-dynamic-page__header-visibility-container--right-gradient"></div>
 </div>

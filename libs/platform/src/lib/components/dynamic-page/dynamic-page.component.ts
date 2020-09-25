@@ -14,7 +14,8 @@ import {
     Renderer2,
     ViewChild,
     ViewEncapsulation,
-    OnDestroy
+    OnDestroy,
+    AfterViewChecked
 } from '@angular/core';
 import { TabListComponent } from '@fundamental-ngx/core';
 import { startWith } from 'rxjs/operators';
@@ -35,7 +36,8 @@ import { Subscription } from 'rxjs';
     encapsulation: ViewEncapsulation.None,
     providers: [DynamicPageService]
 })
-export class DynamicPageComponent extends BaseComponent implements OnInit, AfterContentInit, AfterViewInit, OnDestroy {
+export class DynamicPageComponent extends BaseComponent
+    implements OnInit, AfterContentInit, AfterViewInit, AfterViewChecked, OnDestroy {
     @ContentChildren(DYNAMIC_PAGE_CHILD_TOKEN as any)
     tabbedContent: QueryList<DynamicPageContentComponent>;
 
@@ -119,6 +121,56 @@ export class DynamicPageComponent extends BaseComponent implements OnInit, After
         console.log('header component height is' + this.headerComponent?.elementRef().nativeElement.offsetHeight);
     }
 
+    ngAfterViewChecked(): void {
+        console.log('ngAfterViewChecked');
+        // if (this.headerComponent?.collapsible) {
+        if (!this.scrollDispatcher.scrollContainers.has(this.scrollable)) {
+            this.scrollDispatcher.register(this.scrollable);
+            console.log(this.scrollDispatcher.scrollContainers);
+            const scrollContainers = this.scrollDispatcher.getAncestorScrollContainers(this.scrollable.getElementRef());
+            console.log('ancestor');
+            // gettinig the iincorrect scrollable here.. what changed?
+            console.log(scrollContainers);
+            scrollContainers.forEach((element) => {
+                if (element !== this.scrollable) {
+                    console.log('deregisteerring ' + element.getElementRef().nativeElement.id);
+
+                    this.scrollDispatcher.deregister(element);
+                }
+            });
+            console.log(this.scrollDispatcher.scrollContainers);
+            this.scrollDispatcher.scrolled(10).subscribe((cdk: CdkScrollable) => {
+                this.zone.run(() => {
+                    // Your update here!
+                    console.log('scrolled');
+                    console.log(cdk);
+
+                    // improperly used, currently detecting doc scroll.
+                    // console.log(
+                    //     'header component now height is' + this.headerComponent?.elementRef().nativeElement.offsetHeight
+                    // );
+                    // console.log(this.headerComponent?.collapsible + ' collapsiiblee?');
+
+                    const scrollPosition = cdk.measureScrollOffset('top');
+                    console.log(scrollPosition);
+                    if (scrollPosition > 0) {
+                        console.log('collapsing header');
+
+                        // this._dynamicPageService.toggleHeader(!this.toggledVal);
+                        this._dynamicPageService.collapseHeader();
+                    } else {
+                        // if (this.toggledVal) {
+                        this._dynamicPageService.expandHeader();
+                        // } else {
+                        //     this._dynamicPageService.collapseHeader();
+                        // }
+                    }
+                });
+            });
+        }
+        // }
+    }
+
     ngAfterViewInit(): void {
         // this.scrollDispatcher.ancestorScrolled(this.childDiv).subscribe((scrollable: CdkScrollable) => {
         //     if (scrollable) {
@@ -126,30 +178,30 @@ export class DynamicPageComponent extends BaseComponent implements OnInit, After
         //         console.log(scrollable.getElementRef().nativeElement);
         //     }
         // });
-
         // if (this.isTabbed) {
+        // keeping a settimeout  now, but maybe place it ini aftercontentchecked / afterviewchecked
         // Get all the information about the scrolling component registered in the ScrollDispatcher
-        console.log('tabbed');
-        this.scrollDispatcher.register(this.scrollable);
-        console.log(this.scrollDispatcher.scrollContainers);
-        const scrollContainers = this.scrollDispatcher.getAncestorScrollContainers(this.scrollable.getElementRef());
+        /*  if (this.headerComponent?.collapsible) {
+            console.log('tabbed');
+            this.scrollDispatcher.register(this.scrollable);
+            console.log(this.scrollDispatcher.scrollContainers);
+            const scrollContainers = this.scrollDispatcher.getAncestorScrollContainers(this.scrollable.getElementRef()); */
         // const scrollableElementIds = scrollContainers.map(
         // const scrollableElements = scrollContainers.map(
         //     // (scrollable) => (scrollable === this.scrollable)? scrollable.getElementRef().nativeElement.id
         //     (scrollable) => (scrollable)
         // );
-        console.log('ancestor');
-        // gettinig the iincorrect scrollable here.. what changed?
-        console.log(scrollContainers);
-        scrollContainers.forEach((element) => {
-            if (element !== this.scrollable) {
-                console.log('deregisteerring ' + element.getElementRef().nativeElement.id);
+        /* console.log('ancestor');
+            // gettinig the iincorrect scrollable here.. what changed?
+            console.log(scrollContainers);
+            scrollContainers.forEach((element) => {
+                if (element !== this.scrollable) {
+                    console.log('deregisteerring ' + element.getElementRef().nativeElement.id);
 
-                this.scrollDispatcher.deregister(element);
-            }
-        });
-        console.log(this.scrollDispatcher.scrollContainers);
-
+                    this.scrollDispatcher.deregister(element);
+                }
+            });
+            console.log(this.scrollDispatcher.scrollContainers);*/
         // this.zone.run(() => {
         //     const scroll$ = fromEvent(this.dynPage.nativeElement, 'scroll').pipe(
         //         throttleTime(10),
@@ -171,7 +223,6 @@ export class DynamicPageComponent extends BaseComponent implements OnInit, After
         // });
         // this.scrollDispatcher.register(this.scrollable);
         // console.log('has?' + this.scrollDispatcher.scrollContainers.has(this.scrollable));
-
         // console.log(this.scrollDispatcher.getAncestorScrollContainers(this.contentDyn));
         // this.scrollDispatcher.ancestorScrolled(this.contentDyn).subscribe((cdk: CdkScrollable) => {
         //     console.log(' parent scrolleed');
@@ -184,34 +235,33 @@ export class DynamicPageComponent extends BaseComponent implements OnInit, After
         //     });
         // });
         // issue with scrolldispatcyer itself? read mat design
+        /* this.scrollDispatcher.scrolled(10).subscribe((cdk: CdkScrollable) => {
+                this.zone.run(() => {
+                    // Your update here!
+                    console.log('scrolled');
+                    console.log(cdk);
 
-        this.scrollDispatcher.scrolled(10).subscribe((cdk: CdkScrollable) => {
-            this.zone.run(() => {
-                // Your update here!
-                console.log('scrolled');
-                console.log(cdk);
+                    // improperly used, currently detecting doc scroll.
+                    // console.log(
+                    //     'header component now height is' + this.headerComponent?.elementRef().nativeElement.offsetHeight
+                    // );
 
-                // improperly used, currently detecting doc scroll.
-                // console.log(
-                //     'header component now height is' + this.headerComponent?.elementRef().nativeElement.offsetHeight
-                // );
+                    const scrollPosition = cdk.measureScrollOffset('top');
+                    console.log(scrollPosition);
+                    if (scrollPosition > 0) {
+                        console.log('collapsing header');
 
-                const scrollPosition = cdk.measureScrollOffset('top');
-                console.log(scrollPosition);
-                if (scrollPosition > 0) {
-                    console.log('collapsing header');
-
-                    // this._dynamicPageService.toggleHeader(!this.toggledVal);
-                    this._dynamicPageService.collapseHeader();
-                } else {
-                    // if (this.toggledVal) {
-                    this._dynamicPageService.expandHeader();
-                    // } else {
-                    //     this._dynamicPageService.collapseHeader();
-                    // }
-                }
-            });
-        });
+                        // this._dynamicPageService.toggleHeader(!this.toggledVal);
+                        this._dynamicPageService.collapseHeader();
+                    } else {
+                        // if (this.toggledVal) {
+                        this._dynamicPageService.expandHeader();
+                        // } else {
+                        //     this._dynamicPageService.collapseHeader();
+                        // }
+                    }
+                });
+            });*/
         // fromEvent(this.dynPage.nativeElement, 'scroll')
         //     .pipe(
         //         throttleTime(10),

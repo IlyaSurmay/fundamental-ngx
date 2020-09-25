@@ -9,7 +9,8 @@ import {
     EventEmitter,
     ViewEncapsulation,
     ContentChild,
-    TemplateRef
+    TemplateRef,
+    OnDestroy
 } from '@angular/core';
 
 import { CLASS_NAME } from '../../constants';
@@ -62,6 +63,10 @@ export class DynamicPageHeaderComponent implements OnInit, OnDestroy {
     expandSubscription: Subscription;
     collapseSubscription: Subscription;
 
+    pinned = false;
+    //  tracking collapsible for pinning
+    _collapsible = this.collapsible;
+
     /** @hidden */
     constructor(
         private _elementRef: ElementRef<HTMLElement>,
@@ -94,11 +99,17 @@ export class DynamicPageHeaderComponent implements OnInit, OnDestroy {
         }
     }
     collapseHeader(val: any): any {
+        if (this._isPinned()) {
+            return;
+        }
         this.collapsed = val;
         this.expandCollapseActions();
     }
     /** Handles expanded/collapsed event */
     public toggleCollapse(): void {
+        if (this._isPinned()) {
+            return;
+        }
         this.collapsed = !this.collapsed;
         this.expandCollapseActions();
         // this._calculateExpandAriaLabel();
@@ -114,8 +125,28 @@ export class DynamicPageHeaderComponent implements OnInit, OnDestroy {
         this.collapseChange.emit(event);
     }
 
+    // scenarioi where collapsible = false and pinnable = true is buggy due to html viisibility
     private _isCollapsibleCollapsed(): boolean {
-        return this.collapsible && this.collapsed;
+        return this.collapsible && this.collapsed && this._collapsible;
+    }
+
+    private _isPinned(): boolean {
+        return !this._collapsible && this.pinned;
+    }
+
+    onPinned(): void {
+        this.pinned = !this.pinned; // true false
+        // const collapsible = this.collapsible; // false true
+        // this._collapsible = !this.pinned; // should be false, and pinend should be true
+        // collapsible should be true pinend should be false,
+        if (this.pinned) {
+            this._collapsible = false;
+        } else {
+            this._collapsible = this.collapsible; // reset
+        }
+        // else {
+        //     // this.collapsible = collapsible;
+        // }
     }
 
     elementRef(): ElementRef<any> {

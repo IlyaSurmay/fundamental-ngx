@@ -13,6 +13,7 @@ import { DynamicPageFooterComponent } from './dynamic-page-footer/dynamic-page-f
 import { TabsModule } from '@fundamental-ngx/core';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { DynamicPageTabbedContentComponent } from './dynamic-page-content/dynamic-page-tabbed-content.component';
+import { PlatformButtonModule } from '../button/public_api';
 
 @NgModule({
     declarations: [
@@ -27,7 +28,7 @@ import { DynamicPageTabbedContentComponent } from './dynamic-page-content/dynami
         DynamicPageTabbedContentComponent,
         DynamicPageFooterComponent
     ],
-    imports: [CommonModule, TabsModule, ScrollingModule],
+    imports: [CommonModule, TabsModule, ScrollingModule, PlatformButtonModule],
     exports: [
         DynamicPageComponent,
         DynamicPageTitleComponent,
