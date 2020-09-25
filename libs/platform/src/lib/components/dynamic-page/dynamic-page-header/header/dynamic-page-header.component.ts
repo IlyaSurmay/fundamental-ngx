@@ -15,6 +15,7 @@ import {
 import { CLASS_NAME } from '../../constants';
 import { DynamicPageConfig } from '../../dynamic-page.config';
 import { DynamicPageService } from '../../dynamic-page.service';
+import { Subscription } from 'rxjs';
 
 /** Dynamic Page collapse change event */
 export class DynamicPageCollapseChangeEvent {
@@ -27,7 +28,7 @@ export class DynamicPageCollapseChangeEvent {
     changeDetection: ChangeDetectionStrategy.OnPush,
     encapsulation: ViewEncapsulation.None
 })
-export class DynamicPageHeaderComponent implements OnInit {
+export class DynamicPageHeaderComponent implements OnInit, OnDestroy {
     @Input()
     collapsible = true;
 
@@ -49,13 +50,17 @@ export class DynamicPageHeaderComponent implements OnInit {
     @Input()
     collapseLabel: string = this._dynamicPageConfig.collapseLabel;
 
-    /** Reference to panel content */
+    /** Reference to page header content */
     @ContentChild('headerContent')
     headerContent: TemplateRef<any>;
 
     /** Collapse/Expand change event raised */
     @Output()
     collapseChange: EventEmitter<DynamicPageCollapseChangeEvent> = new EventEmitter<DynamicPageCollapseChangeEvent>();
+
+    toggleSubscription: Subscription;
+    expandSubscription: Subscription;
+    collapseSubscription: Subscription;
 
     /** @hidden */
     constructor(
@@ -64,25 +69,42 @@ export class DynamicPageHeaderComponent implements OnInit {
         protected _dynamicPageConfig: DynamicPageConfig,
         private _dynamicPageService: DynamicPageService
     ) {
-        this._dynamicPageService.$toggle.subscribe((val) => {
-            console.log('subscriibied to dyn page serviicee header' + val);
-            this.toggleCollapse();
-        });
+        if (this.collapsible) {
+            this.toggleSubscription = this._dynamicPageService.$toggle.subscribe((val) => {
+                console.log('subscriibied to dyn page serviicee header' + val);
+                this.toggleCollapse();
+            });
+            this.expandSubscription = this._dynamicPageService.$expand.subscribe(() => {
+                console.log('subscriibied to expand');
+                this.collapseHeader(false);
+            });
+            this.collapseSubscription = this._dynamicPageService.$collapse.subscribe(() => {
+                console.log('subscriibied to collapse');
+                this.collapseHeader(true);
+            });
+        }
     }
 
     /** @hidden */
     ngOnInit(): void {
         // this._addClassNameToHostElement(CLASS_NAME.dynamicPageHeader); // not getting this to work right
         // this._addClassNameToHostElement(CLASS_NAME.dynamicPageHeaderExtraLarge);
-        if (this.collapsed) {
+        if (this._isCollapsibleCollapsed()) {
             this._setStyleToHostElement('z-index', 1);
         }
     }
-
+    collapseHeader(val: any): any {
+        this.collapsed = val;
+        this.expandCollapseActions();
+    }
     /** Handles expanded/collapsed event */
     public toggleCollapse(): void {
         this.collapsed = !this.collapsed;
-        if (this.collapsed) {
+        this.expandCollapseActions();
+        // this._calculateExpandAriaLabel();
+    }
+    private expandCollapseActions(): void {
+        if (this._isCollapsibleCollapsed()) {
             this._setStyleToHostElement('z-index', 1);
         } else {
             this._removeStyleFromHostElement('z-index');
@@ -90,9 +112,21 @@ export class DynamicPageHeaderComponent implements OnInit {
         const event = new DynamicPageCollapseChangeEvent(this, this.collapsed);
         // this._dynamicPageService.toggleHeader(this.collapsed);
         this.collapseChange.emit(event);
-        // this._calculateExpandAriaLabel();
     }
 
+    private _isCollapsibleCollapsed(): boolean {
+        return this.collapsible && this.collapsed;
+    }
+
+    elementRef(): ElementRef<any> {
+        return this._elementRef;
+    }
+
+    ngOnDestroy(): void {
+        this.toggleSubscription.unsubscribe();
+        this.expandSubscription.unsubscribe();
+        this.collapseSubscription.unsubscribe();
+    }
     /**@hidden */
     private _addClassNameToHostElement(className: string): void {
         this._renderer.addClass(this._elementRef.nativeElement, className);

@@ -12,39 +12,30 @@ import {
     ContentChild,
     TemplateRef,
     HostBinding,
-    HostListener,
-    OnDestroy
+    HostListener
 } from '@angular/core';
 
 import { CLASS_NAME, DYNAMIC_PAGE_CHILD_TOKEN } from '../constants';
 import { ScrollDispatcher, CdkScrollable } from '@angular/cdk/scrolling';
 import { DynamicPageService } from '../dynamic-page.service';
+import { TabPanelComponent } from '@fundamental-ngx/core';
+import { DynamicPageContentComponent } from './dynamic-page-content.component';
 
 @Component({
-    selector: 'fdp-dynamic-page-content',
-    templateUrl: './dynamic-page-content.component.html',
-    styleUrls: ['./dynamic-page-content.component.scss'],
+    selector: 'fdp-dynamic-page-tabbed-content',
+    template: `<ng-template><ng-content></ng-content></ng-template>`,
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         {
             provide: DYNAMIC_PAGE_CHILD_TOKEN,
-            useExisting: forwardRef(() => DynamicPageContentComponent)
+            useExisting: forwardRef(() => DynamicPageTabbedContentComponent)
         }
     ]
 })
-export class DynamicPageContentComponent extends CdkScrollable implements OnInit, AfterViewInit, OnDestroy {
-    @Input()
-    tabLabel: string;
-    // set tabLabel(label: string) {
-    //     if (label) {
-    //         this._label = label;
-    //     }
-    // }
+export class DynamicPageTabbedContentComponent extends CdkScrollable implements OnInit, AfterViewInit {
+    // @Input()
+    // tabLabel: string;
 
-    // get tabLabel(): string {
-    //     return this._label;
-    // }
-    private _label: string;
     @ViewChild(CdkScrollable)
     cdkScrollable: CdkScrollable;
 
@@ -55,8 +46,11 @@ export class DynamicPageContentComponent extends CdkScrollable implements OnInit
     isVisible = true;
 
     /** @hidden */
-    @ViewChild('tabbed')
+    @ViewChild(TemplateRef)
     contentTemplateRef: TemplateRef<any>;
+
+    @ContentChild(DynamicPageContentComponent)
+    tabPanelContent: DynamicPageContentComponent;
 
     constructor(
         private _elementRef: ElementRef<HTMLElement>,
@@ -68,10 +62,10 @@ export class DynamicPageContentComponent extends CdkScrollable implements OnInit
         super(_elementRef, scrollDispatcher, zone);
         // this._setAttributeToHostElement('cdkScrollable', '');
         // this.scrollDispatcher.register(this.scrollable);
-        // this._dynamicPageService.$toggle.subscribe((val) => {
-        //     console.log('subscriibied to dyn page serviicee in content' + val);
-        //     this.toggledVal = val;
-        // });
+        this._dynamicPageService.$toggle.subscribe((val) => {
+            console.log('subscriibied to dyn page serviicee in content' + val);
+            this.toggledVal = val;
+        });
         // this.scrollDispatcher.scrolled().subscribe((cdk: CdkScrollable) => {
         //     this.zone.run(() => {
         //         // Your update here!
@@ -83,18 +77,18 @@ export class DynamicPageContentComponent extends CdkScrollable implements OnInit
     }
 
     ngOnInit(): void {
-        this._addClassNameToHostElement(CLASS_NAME.dynamicPageContent);
+        // this._addClassNameToHostElement(CLASS_NAME.dynamicPageContent);
         this._addClassNameToHostElement(CLASS_NAME.dynamicPageContentExtraLarge);
-        if (this.tabLabel) {
-            // add tabbed content
-            // todo add to the fd-tab class properly
-            // this._addClassNameToHostElement(CLASS_NAME.dynamicPageTabs);
-            this._removeClassNameToHostElement(CLASS_NAME.dynamicPageContent);
-            // this._addClassNameToHostElement(CLASS_NAME.dynamicPageTabsExtraLarge);
-            // this._removeClassNameToHostElement(CLASS_NAME.dynamicPageContentExtraLarge);
+        // if (this.tabLabel) {
+        // add tabbed content
+        // todo add to the fd-tab class properly
+        // this._addClassNameToHostElement(CLASS_NAME.dynamicPageTabs);
+        this._removeClassNameToHostElement(CLASS_NAME.dynamicPageContent);
+        // this._addClassNameToHostElement(CLASS_NAME.dynamicPageTabsExtraLarge);
+        // this._removeClassNameToHostElement(CLASS_NAME.dynamicPageContentExtraLarge);
 
-            // this._setStyleToHostElement('overflow', 'scroll');
-        }
+        // this._setStyleToHostElement('overflow', 'scroll');
+        // }
     }
 
     ngAfterViewInit(): void {
@@ -179,9 +173,6 @@ export class DynamicPageContentComponent extends CdkScrollable implements OnInit
     //     console.log('scrollinig');
     // }
 
-    ngOnDestroy(): void {
-        this.scrollDispatcher.deregister(this.cdkScrollable);
-    }
     /**@hidden */
     private _addClassNameToHostElement(className: string): void {
         this._renderer.addClass(this._elementRef.nativeElement, className);

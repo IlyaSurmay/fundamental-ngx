@@ -20,7 +20,8 @@
             *ngIf="collapsible"
             (click)="toggleCollapse()"
         >
-            <i class="sap-icon--slim-arrow-up"></i>
+            <i *ngIf="!collapsed" class="sap-icon--slim-arrow-up"></i>
+            <i *ngIf="collapsed" class="sap-icon--slim-arrow-down"></i>
         </button>
         <button class="fd-dynamic-page__pin-button fd-button fd-button--compact" aria-label="Pin this" *ngIf="pinnable">
             <i class="sap-icon--pushpin-off"></i>

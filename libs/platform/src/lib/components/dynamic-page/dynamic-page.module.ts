@@ -12,6 +12,7 @@ import { DynamicPageHeaderComponent } from './dynamic-page-header/header/dynamic
 import { DynamicPageFooterComponent } from './dynamic-page-footer/dynamic-page-footer.component';
 import { TabsModule } from '@fundamental-ngx/core';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { DynamicPageTabbedContentComponent } from './dynamic-page-content/dynamic-page-tabbed-content.component';
 
 @NgModule({
     declarations: [
@@ -23,6 +24,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
         DynamicPageLayoutActionsComponent,
         DynamicPageHeaderComponent,
         DynamicPageContentComponent,
+        DynamicPageTabbedContentComponent,
         DynamicPageFooterComponent
     ],
     imports: [CommonModule, TabsModule, ScrollingModule],
@@ -35,6 +37,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
         DynamicPageLayoutActionsComponent,
         DynamicPageHeaderComponent,
         DynamicPageContentComponent,
+        DynamicPageTabbedContentComponent,
         DynamicPageFooterComponent
     ]
 })

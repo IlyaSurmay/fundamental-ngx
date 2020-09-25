@@ -42,6 +42,9 @@ export class DynamicPageTitleComponent implements OnInit {
     //     this.headerComponent.toggleCollapse();
     // }
 
+    elementRef(): ElementRef<HTMLElement> {
+        return this._elementRef;
+    }
     /** @hidden */
     ngOnInit(): void {
         this._addClassNameToHostElement(CLASS_NAME.dynamicPageTitleArea); // not getting this to work right
