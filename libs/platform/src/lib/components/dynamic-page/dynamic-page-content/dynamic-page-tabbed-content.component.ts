@@ -78,7 +78,7 @@ export class DynamicPageTabbedContentComponent extends CdkScrollable implements 
 
     ngOnInit(): void {
         // this._addClassNameToHostElement(CLASS_NAME.dynamicPageContent);
-        this._addClassNameToHostElement(CLASS_NAME.dynamicPageContentExtraLarge);
+        // this._addClassNameToHostElement(CLASS_NAME.dynamicPageContentExtraLarge);
         // if (this.tabLabel) {
         // add tabbed content
         // todo add to the fd-tab class properly

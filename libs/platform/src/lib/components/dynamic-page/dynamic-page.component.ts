@@ -15,12 +15,13 @@ import {
     ViewChild,
     ViewEncapsulation,
     OnDestroy,
-    AfterViewChecked
+    AfterViewChecked,
+    Input
 } from '@angular/core';
 import { TabListComponent } from '@fundamental-ngx/core';
 import { startWith } from 'rxjs/operators';
 import { BaseComponent } from '../base';
-import { CLASS_NAME, DYNAMIC_PAGE_CHILD_TOKEN } from './constants';
+import { CLASS_NAME, DYNAMIC_PAGE_CHILD_TOKEN, BACKGROUND_TYPE, RESPONSIVE_SIZE } from './constants';
 import { DynamicPageContentComponent } from './dynamic-page-content/dynamic-page-content.component';
 import { DynamicPageService } from './dynamic-page.service';
 import { DynamicPageTabbedContentComponent } from './dynamic-page-content/dynamic-page-tabbed-content.component';
@@ -47,10 +48,10 @@ export class DynamicPageComponent extends BaseComponent
     // _content: DynamicPageTabbedContentComponent[] = [];
 
     isTabbed = false;
-    @ViewChild(DynamicPageHeaderComponent)
+    @ContentChild(DynamicPageHeaderComponent)
     headerComponent: DynamicPageHeaderComponent;
 
-    @ViewChild(DynamicPageTitleComponent)
+    @ContentChild(DynamicPageTitleComponent)
     titleComponent: DynamicPageTitleComponent;
 
     @ViewChild(DynamicPageContentComponent)
@@ -68,6 +69,8 @@ export class DynamicPageComponent extends BaseComponent
     isVisible = true;
     toggleSubscription: Subscription;
 
+    scrollSubscription: Subscription;
+
     /** @hidden */
     @ContentChild(TabListComponent)
     tabList: TabListComponent; // for adding shadow styles
@@ -77,6 +80,12 @@ export class DynamicPageComponent extends BaseComponent
     set tabListElementRef(tabListComponentElementRef: ElementRef<HTMLElement>) {
         this._setTabListElementClass(tabListComponentElementRef?.nativeElement);
     }
+
+    @Input()
+    background: BACKGROUND_TYPE = 'solid';
+
+    @Input()
+    size: RESPONSIVE_SIZE = 'extra-large';
 
     /** @hidden */
     constructor(
@@ -119,59 +128,74 @@ export class DynamicPageComponent extends BaseComponent
     ngAfterContentInit(): void {
         this._listenToChildrenQueryListChanges();
         console.log('header component height is' + this.headerComponent?.elementRef().nativeElement.offsetHeight);
+        if (this.background) {
+            this.titleComponent.background = this.background;
+            this.headerComponent.background = this.background;
+            this._childcontent.background = this.background;
+        }
+        if (this.size) {
+            this.titleComponent.size = this.size;
+            this.headerComponent.size = this.size;
+            this._childcontent.size = this.size;
+        }
     }
 
     ngAfterViewChecked(): void {
         console.log('ngAfterViewChecked');
         // if (this.headerComponent?.collapsible) {
-        if (!this.scrollDispatcher.scrollContainers.has(this.scrollable)) {
-            this.scrollDispatcher.register(this.scrollable);
-            console.log(this.scrollDispatcher.scrollContainers);
-            const scrollContainers = this.scrollDispatcher.getAncestorScrollContainers(this.scrollable.getElementRef());
-            console.log('ancestor');
-            // gettinig the iincorrect scrollable here.. what changed?
-            console.log(scrollContainers);
-            scrollContainers.forEach((element) => {
-                if (element !== this.scrollable) {
-                    console.log('deregisteerring ' + element.getElementRef().nativeElement.id);
 
-                    this.scrollDispatcher.deregister(element);
-                }
-            });
-            console.log(this.scrollDispatcher.scrollContainers);
-            this.scrollDispatcher.scrolled(10).subscribe((cdk: CdkScrollable) => {
-                this.zone.run(() => {
-                    // Your update here!
-                    console.log('scrolled');
-                    console.log(cdk);
-
-                    // improperly used, currently detecting doc scroll.
-                    // console.log(
-                    //     'header component now height is' + this.headerComponent?.elementRef().nativeElement.offsetHeight
-                    // );
-                    // console.log(this.headerComponent?.collapsible + ' collapsiiblee?');
-
-                    const scrollPosition = cdk.measureScrollOffset('top');
-                    console.log(scrollPosition);
-                    if (scrollPosition > 0) {
-                        console.log('collapsing header');
-
-                        // this._dynamicPageService.toggleHeader(!this.toggledVal);
-                        this._dynamicPageService.collapseHeader();
-                    } else {
-                        // if (this.toggledVal) {
-                        this._dynamicPageService.expandHeader();
-                        // } else {
-                        //     this._dynamicPageService.collapseHeader();
-                        // }
-                    }
-                });
-            });
-        }
         // }
     }
 
     ngAfterViewInit(): void {
+        if (this.headerComponent?.collapsible) {
+            if (!this.scrollDispatcher.scrollContainers.has(this.scrollable)) {
+                this.scrollDispatcher.register(this.scrollable);
+                console.log(this.scrollDispatcher.scrollContainers);
+                const scrollContainers = this.scrollDispatcher.getAncestorScrollContainers(
+                    this.scrollable.getElementRef()
+                );
+                // console.log('ancestor');
+                // gettinig the iincorrect scrollable here.. what changed?
+                // console.log(scrollContainers);
+                scrollContainers.forEach((element) => {
+                    if (element !== this.scrollable) {
+                        // console.log('deregisteerring ' + element.getElementRef().nativeElement.id);
+
+                        this.scrollDispatcher.deregister(element);
+                    }
+                });
+                // console.log(this.scrollDispatcher.scrollContainers);
+                this.scrollSubscription = this.scrollDispatcher.scrolled(10).subscribe((cdk: CdkScrollable) => {
+                    this.zone.run(() => {
+                        // Your update here!
+                        console.log('scrolled');
+                        console.log(cdk);
+
+                        // improperly used, currently detecting doc scroll.
+                        // console.log(
+                        //     'header component now height is' + this.headerComponent?.elementRef().nativeElement.offsetHeight
+                        // );
+                        // console.log(this.headerComponent?.collapsible + ' collapsiiblee?');
+
+                        const scrollPosition = cdk.measureScrollOffset('top');
+                        console.log(scrollPosition);
+                        if (scrollPosition > 0) {
+                            console.log('collapsing header');
+
+                            // this._dynamicPageService.toggleHeader(!this.toggledVal);
+                            this._dynamicPageService.collapseHeader();
+                        } else {
+                            // if (this.toggledVal) {
+                            this._dynamicPageService.expandHeader();
+                            // } else {
+                            //     this._dynamicPageService.collapseHeader();
+                            // }
+                        }
+                    });
+                });
+            }
+        }
         // this.scrollDispatcher.ancestorScrolled(this.childDiv).subscribe((scrollable: CdkScrollable) => {
         //     if (scrollable) {
         //         console.log('The ancestor has scrolled, from:');
@@ -331,6 +355,7 @@ export class DynamicPageComponent extends BaseComponent
     ngOnDestroy(): void {
         this.scrollDispatcher.deregister(this.scrollable);
         this.toggleSubscription.unsubscribe();
+        this.scrollSubscription.unsubscribe();
     }
 
     /**@hidden */

@@ -1,22 +1,21 @@
 import {
-    Component,
-    OnInit,
+    AfterViewInit,
     ChangeDetectionStrategy,
+    Component,
     ElementRef,
-    Renderer2,
-    Input,
-    Output,
     EventEmitter,
-    ViewEncapsulation,
-    ContentChild,
-    TemplateRef,
-    OnDestroy
+    Input,
+    OnDestroy,
+    OnInit,
+    Output,
+    Renderer2,
+    ViewChild,
+    ViewEncapsulation
 } from '@angular/core';
-
-import { CLASS_NAME } from '../../constants';
+import { Subscription } from 'rxjs';
+import { BACKGROUND_TYPE, CLASS_NAME, RESPONSIVE_SIZE } from '../../constants';
 import { DynamicPageConfig } from '../../dynamic-page.config';
 import { DynamicPageService } from '../../dynamic-page.service';
-import { Subscription } from 'rxjs';
 
 /** Dynamic Page collapse change event */
 export class DynamicPageCollapseChangeEvent {
@@ -29,7 +28,7 @@ export class DynamicPageCollapseChangeEvent {
     changeDetection: ChangeDetectionStrategy.OnPush,
     encapsulation: ViewEncapsulation.None
 })
-export class DynamicPageHeaderComponent implements OnInit, OnDestroy {
+export class DynamicPageHeaderComponent implements OnInit, AfterViewInit, OnDestroy {
     @Input()
     collapsible = true;
 
@@ -51,10 +50,6 @@ export class DynamicPageHeaderComponent implements OnInit, OnDestroy {
     @Input()
     collapseLabel: string = this._dynamicPageConfig.collapseLabel;
 
-    /** Reference to page header content */
-    @ContentChild('headerContent')
-    headerContent: TemplateRef<any>;
-
     /** Collapse/Expand change event raised */
     @Output()
     collapseChange: EventEmitter<DynamicPageCollapseChangeEvent> = new EventEmitter<DynamicPageCollapseChangeEvent>();
@@ -66,6 +61,37 @@ export class DynamicPageHeaderComponent implements OnInit, OnDestroy {
     pinned = false;
     //  tracking collapsible for pinning
     _collapsible = this.collapsible;
+
+    _background: BACKGROUND_TYPE;
+    /** Reference to page header content */
+    @ViewChild('headerContent')
+    headerContent: ElementRef<HTMLElement>;
+
+    @Input()
+    set background(backgroundType: BACKGROUND_TYPE) {
+        if (backgroundType) {
+            this._background = backgroundType;
+            this._setBackgroundStyles(backgroundType);
+        }
+    }
+
+    get background(): BACKGROUND_TYPE {
+        return this._background;
+    }
+
+    _size: RESPONSIVE_SIZE = 'extra-large';
+
+    @Input()
+    set size(sizeType: RESPONSIVE_SIZE) {
+        if (sizeType) {
+            this._size = sizeType;
+            this._setSize(sizeType);
+        }
+    }
+
+    get size(): RESPONSIVE_SIZE {
+        return this._size;
+    }
 
     /** @hidden */
     constructor(
@@ -96,6 +122,15 @@ export class DynamicPageHeaderComponent implements OnInit, OnDestroy {
         // this._addClassNameToHostElement(CLASS_NAME.dynamicPageHeaderExtraLarge);
         if (this._isCollapsibleCollapsed()) {
             this._setStyleToHostElement('z-index', 1);
+        }
+    }
+    /** @hidden */
+    ngAfterViewInit(): void {
+        if (this.background) {
+            this._setBackgroundStyles(this.background);
+        }
+        if (this.size) {
+            this._setSize(this.size);
         }
     }
     collapseHeader(val: any): any {
@@ -154,15 +189,62 @@ export class DynamicPageHeaderComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        console.log('calling ngdestroy');
+
         this.toggleSubscription.unsubscribe();
         this.expandSubscription.unsubscribe();
         this.collapseSubscription.unsubscribe();
+    }
+
+    _setBackgroundStyles(background: BACKGROUND_TYPE): any {
+        switch (background) {
+            case 'transparent':
+                // this._addClassNameToHostElement(CLASS_NAME.dynamicPageHeaderTransparentBg);
+                if (this.headerContent) {
+                    this._addClassNameToElement(CLASS_NAME.dynamicPageHeaderTransparentBg, this.headerContent);
+                }
+                break;
+            case 'list':
+            case 'solid':
+            default:
+                if (this.headerContent) {
+                    this._removeClassNameFromElement(CLASS_NAME.dynamicPageHeaderTransparentBg, this.headerContent);
+                }
+                // this._removeClassNameToHostElement(CLASS_NAME.dynamicPageHeaderTransparentBg);
+                break;
+        }
+    }
+
+    _setSize(sizeType: RESPONSIVE_SIZE): any {
+        if (this.headerContent) {
+            switch (sizeType) {
+                case 'small':
+                    this._addClassNameToElement(CLASS_NAME.dynamicPageHeaderSmall, this.headerContent);
+                    break;
+                case 'medium':
+                    this._addClassNameToElement(CLASS_NAME.dynamicPageHeaderMedium, this.headerContent);
+
+                    break;
+                case 'large':
+                    this._addClassNameToElement(CLASS_NAME.dynamicPageHeaderLarge, this.headerContent);
+
+                    break;
+                case 'extra-large':
+                default:
+                    this._addClassNameToElement(CLASS_NAME.dynamicPageHeaderExtraLarge, this.headerContent);
+
+                    break;
+            }
+        }
     }
     /**@hidden */
     private _addClassNameToHostElement(className: string): void {
         this._renderer.addClass(this._elementRef.nativeElement, className);
     }
-
+    /**@hidden */
+    private _removeClassNameToHostElement(className: string): void {
+        this._renderer.removeClass(this._elementRef.nativeElement, className);
+    }
     /**@hidden */
     private _setStyleToHostElement(attribute: string, value: any): void {
         this._renderer.setStyle(this._elementRef.nativeElement, attribute, value);
@@ -170,5 +252,13 @@ export class DynamicPageHeaderComponent implements OnInit, OnDestroy {
     /**@hidden */
     private _removeStyleFromHostElement(styleName: string): void {
         this._renderer.removeStyle(this._elementRef.nativeElement, styleName);
+    }
+
+    private _addClassNameToElement(className: string, element: ElementRef<HTMLElement>): void {
+        this._renderer.addClass(element.nativeElement, className);
+    }
+
+    private _removeClassNameFromElement(className: string, element: ElementRef<HTMLElement>): void {
+        this._renderer.removeClass(element.nativeElement, className);
     }
 }

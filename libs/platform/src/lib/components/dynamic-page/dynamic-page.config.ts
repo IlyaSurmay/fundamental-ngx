@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-
 import { PlatformConfig } from '../../platform.config';
-import { ContentDensity } from '../form/form-control';
 
 /**
  * Default options for platform dynamic-page
@@ -17,11 +15,6 @@ export class DynamicPageConfig {
      * ARIA label for button when the Panel is expanded
      */
     collapseLabel = 'Collapse Header';
-
-    /**
-     * Content Density of element. 'cozy' | 'compact'
-     */
-    // contentDensity: ContentDensity;
 
     /**
      * Create Provider factory function

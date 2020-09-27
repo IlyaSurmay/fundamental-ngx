@@ -1,23 +1,19 @@
+import { CdkScrollable, ScrollDispatcher } from '@angular/cdk/scrolling';
 import {
-    Component,
-    OnInit,
+    AfterViewInit,
     ChangeDetectionStrategy,
+    Component,
     ElementRef,
-    Renderer2,
     forwardRef,
     Input,
-    ViewChild,
-    AfterViewInit,
     NgZone,
-    ContentChild,
+    OnDestroy,
+    OnInit,
+    Renderer2,
     TemplateRef,
-    HostBinding,
-    HostListener,
-    OnDestroy
+    ViewChild
 } from '@angular/core';
-
-import { CLASS_NAME, DYNAMIC_PAGE_CHILD_TOKEN } from '../constants';
-import { ScrollDispatcher, CdkScrollable } from '@angular/cdk/scrolling';
+import { BACKGROUND_TYPE, CLASS_NAME, DYNAMIC_PAGE_CHILD_TOKEN, RESPONSIVE_SIZE } from '../constants';
 import { DynamicPageService } from '../dynamic-page.service';
 
 @Component({
@@ -58,6 +54,32 @@ export class DynamicPageContentComponent extends CdkScrollable implements OnInit
     @ViewChild('tabbed')
     contentTemplateRef: TemplateRef<any>;
 
+    _background: BACKGROUND_TYPE;
+
+    @Input()
+    set background(backgroundType: BACKGROUND_TYPE) {
+        if (backgroundType) {
+            this._background = backgroundType;
+            this._setBackgroundStyles(backgroundType);
+        }
+    }
+
+    get background(): BACKGROUND_TYPE {
+        return this._background;
+    }
+    _size: RESPONSIVE_SIZE = 'extra-large';
+
+    @Input()
+    set size(sizeType: RESPONSIVE_SIZE) {
+        if (sizeType) {
+            this._size = sizeType;
+            this._setSize(sizeType);
+        }
+    }
+
+    get size(): RESPONSIVE_SIZE {
+        return this._size;
+    }
     constructor(
         private _elementRef: ElementRef<HTMLElement>,
         private _renderer: Renderer2,
@@ -84,7 +106,9 @@ export class DynamicPageContentComponent extends CdkScrollable implements OnInit
 
     ngOnInit(): void {
         this._addClassNameToHostElement(CLASS_NAME.dynamicPageContent);
-        this._addClassNameToHostElement(CLASS_NAME.dynamicPageContentExtraLarge);
+        if (this.background) {
+            this._setBackgroundStyles(this.background);
+        }
         if (this.tabLabel) {
             // add tabbed content
             // todo add to the fd-tab class properly
@@ -97,6 +121,38 @@ export class DynamicPageContentComponent extends CdkScrollable implements OnInit
         }
     }
 
+    _setBackgroundStyles(background: BACKGROUND_TYPE): any {
+        switch (background) {
+            case 'transparent':
+                this._addClassNameToHostElement(CLASS_NAME.dynamicPageContentTransparentBg);
+                break;
+            case 'list':
+                this._addClassNameToHostElement(CLASS_NAME.dynamicPageContentListBg);
+                break;
+            case 'solid':
+            default:
+                this._removeClassNameToHostElement(CLASS_NAME.dynamicPageContentTransparentBg);
+                this._removeClassNameToHostElement(CLASS_NAME.dynamicPageContentListBg);
+                break;
+        }
+    }
+    _setSize(sizeType: RESPONSIVE_SIZE): any {
+        switch (sizeType) {
+            case 'small':
+                this._addClassNameToHostElement(CLASS_NAME.dynamicPageContentAreaSmall);
+                break;
+            case 'medium':
+                this._addClassNameToHostElement(CLASS_NAME.dynamicPageContentAreaMedium);
+                break;
+            case 'large':
+                this._addClassNameToHostElement(CLASS_NAME.dynamicPageContentAreaLarge);
+                break;
+            case 'extra-large':
+            default:
+                this._addClassNameToHostElement(CLASS_NAME.dynamicPageContentAreaExtraLarge);
+                break;
+        }
+    }
     ngAfterViewInit(): void {
         // this.scrollDispatcher.register(this.cdkScrollable);
         // console.log('has?' + this.scrollDispatcher.scrollContainers.has(this.cdkScrollable));
