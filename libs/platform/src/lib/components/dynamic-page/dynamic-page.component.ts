@@ -16,7 +16,9 @@ import {
     ViewEncapsulation,
     OnDestroy,
     AfterViewChecked,
-    Input
+    Input,
+    HostBinding,
+    TemplateRef
 } from '@angular/core';
 import { TabListComponent } from '@fundamental-ngx/core';
 import { startWith } from 'rxjs/operators';
@@ -28,7 +30,9 @@ import { DynamicPageTabbedContentComponent } from './dynamic-page-content/dynami
 import { DynamicPageHeaderComponent } from './dynamic-page-header/header/dynamic-page-header.component';
 import { DynamicPageTitleComponent } from './dynamic-page-header/title/dynamic-page-title.component';
 import { Subscription } from 'rxjs';
+import { DynamicPageConfig } from './dynamic-page.config';
 
+let dynamicPageId = 0;
 @Component({
     selector: 'fdp-dynamic-page',
     templateUrl: './dynamic-page.component.html',
@@ -39,10 +43,20 @@ import { Subscription } from 'rxjs';
 })
 export class DynamicPageComponent extends BaseComponent
     implements OnInit, AfterContentInit, AfterViewInit, AfterViewChecked, OnDestroy {
-    @ContentChildren(DYNAMIC_PAGE_CHILD_TOKEN as any)
+    @ContentChildren(DYNAMIC_PAGE_CHILD_TOKEN as any, { descendants: true })
     tabbedContent: QueryList<DynamicPageContentComponent>;
 
     toggledVal = false;
+
+    /** Dynamic Page ID with default value  */
+    @Input()
+    @HostBinding('attr.id')
+    id = 'fdp-dynamic-page-id-' + dynamicPageId++;
+
+    /** Page role  */
+    @Input()
+    @HostBinding('attr.role')
+    role = 'region';
 
     _tabs: DynamicPageContentComponent[] = [];
     // _content: DynamicPageTabbedContentComponent[] = [];
@@ -66,6 +80,9 @@ export class DynamicPageComponent extends BaseComponent
     // @ViewChild('dynPage')
     // childDiv: ElementRef;
 
+    @Input()
+    ariaLabel: string;
+
     isVisible = true;
     toggleSubscription: Subscription;
 
@@ -88,11 +105,18 @@ export class DynamicPageComponent extends BaseComponent
     size: RESPONSIVE_SIZE = 'extra-large';
 
     /** @hidden */
+    contentTemplate: TemplateRef<any>;
+
+    /** @hidden */
+    private _subscriptions: Subscription = new Subscription();
+
+    /** @hidden */
     constructor(
         protected _cd: ChangeDetectorRef,
         private _elementRef: ElementRef<HTMLElement>,
         private _renderer: Renderer2,
         private _dynamicPageService: DynamicPageService,
+        protected _dynamicPageConfig: DynamicPageConfig,
         private scrollDispatcher: ScrollDispatcher,
         private zone: NgZone
     ) {

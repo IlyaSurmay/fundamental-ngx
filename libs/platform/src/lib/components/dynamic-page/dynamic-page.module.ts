@@ -10,7 +10,6 @@ import { DynamicPageGlobalActionsComponent } from './dynamic-page-header/actions
 import { DynamicPageLayoutActionsComponent } from './dynamic-page-header/actions/layout-actions/dynamic-page-layout-actions.component';
 import { DynamicPageHeaderComponent } from './dynamic-page-header/header/dynamic-page-header.component';
 import { DynamicPageKeyInfoComponent } from './dynamic-page-header/key-info/dynamic-page-key-info.component';
-import { DynamicPageSubtitleComponent } from './dynamic-page-header/subtitle/dynamic-page-subtitle.component';
 import { DynamicPageTitleComponent } from './dynamic-page-header/title/dynamic-page-title.component';
 import { DynamicPageComponent } from './dynamic-page.component';
 
@@ -18,7 +17,6 @@ import { DynamicPageComponent } from './dynamic-page.component';
     declarations: [
         DynamicPageComponent,
         DynamicPageTitleComponent,
-        DynamicPageSubtitleComponent,
         DynamicPageKeyInfoComponent,
         DynamicPageGlobalActionsComponent,
         DynamicPageLayoutActionsComponent,
@@ -31,7 +29,6 @@ import { DynamicPageComponent } from './dynamic-page.component';
     exports: [
         DynamicPageComponent,
         DynamicPageTitleComponent,
-        DynamicPageSubtitleComponent,
         DynamicPageKeyInfoComponent,
         DynamicPageGlobalActionsComponent,
         DynamicPageLayoutActionsComponent,

@@ -1,7 +1,6 @@
 <div
     class="fd-dynamic-page__header"
-    role="region"
-    aria-label="Dynamic Page Desktop Header"
+    [attr.aria-label]="headerAriaLabel"
     *ngIf="!collapsed"
     id="fddplhvc1"
     #headerContent
@@ -13,7 +12,8 @@
     <div class="fd-dynamic-page__header-visibility-container--button-group">
         <button
             class="fd-dynamic-page__collapse-button fd-button fd-button--compact"
-            aria-label="See More"
+            [attr.aria-label]="expandCollapseAriaLabel"
+            [attr.title]="expandCollapseAriaLabel"
             [attr.aria-expanded]="!collapsed"
             aria-haspopup="true"
             aria-controls="fddplhvc1"
@@ -25,7 +25,8 @@
         </button>
         <button
             class="fd-dynamic-page__pin-button fd-button fd-button--compact"
-            aria-label="Pin this"
+            [attr.aria-label]="pinUnpinAriaLabel"
+            [attr.title]="pinUnpinAriaLabel"
             [attr.aria-selected]="pinned"
             (click)="onPinned()"
             *ngIf="pinnable"

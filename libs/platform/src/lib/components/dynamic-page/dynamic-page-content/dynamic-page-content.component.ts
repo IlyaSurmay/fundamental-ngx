@@ -67,7 +67,7 @@ export class DynamicPageContentComponent extends CdkScrollable implements OnInit
     get background(): BACKGROUND_TYPE {
         return this._background;
     }
-    _size: RESPONSIVE_SIZE = 'extra-large';
+    _size: RESPONSIVE_SIZE;
 
     @Input()
     set size(sizeType: RESPONSIVE_SIZE) {

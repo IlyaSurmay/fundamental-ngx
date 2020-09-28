@@ -10,7 +10,8 @@ import {
     Output,
     Renderer2,
     ViewChild,
-    ViewEncapsulation
+    ViewEncapsulation,
+    HostBinding
 } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { BACKGROUND_TYPE, CLASS_NAME, RESPONSIVE_SIZE } from '../../constants';
@@ -50,6 +51,12 @@ export class DynamicPageHeaderComponent implements OnInit, AfterViewInit, OnDest
     @Input()
     collapseLabel: string = this._dynamicPageConfig.collapseLabel;
 
+    /**
+     * @hidden
+     * expand/collapse aria label based on the current state
+     */
+    expandCollapseAriaLabel: string;
+
     /** Collapse/Expand change event raised */
     @Output()
     collapseChange: EventEmitter<DynamicPageCollapseChangeEvent> = new EventEmitter<DynamicPageCollapseChangeEvent>();
@@ -67,6 +74,26 @@ export class DynamicPageHeaderComponent implements OnInit, AfterViewInit, OnDest
     @ViewChild('headerContent')
     headerContent: ElementRef<HTMLElement>;
 
+    /** Header role  */
+    @Input()
+    @HostBinding('attr.role')
+    role = 'region';
+
+    @Input()
+    headerAriaLabel: string;
+
+    /**
+     * @hidden
+     * pn/unpin aria label based on the current state
+     */
+    pinUnpinAriaLabel: string;
+
+    @Input()
+    pinAriaLabel: string = this._dynamicPageConfig.pinLabel;
+
+    @Input()
+    unpinAriaLabel: string = this._dynamicPageConfig.unpinLabel;
+
     @Input()
     set background(backgroundType: BACKGROUND_TYPE) {
         if (backgroundType) {
@@ -79,7 +106,7 @@ export class DynamicPageHeaderComponent implements OnInit, AfterViewInit, OnDest
         return this._background;
     }
 
-    _size: RESPONSIVE_SIZE = 'extra-large';
+    _size: RESPONSIVE_SIZE;
 
     @Input()
     set size(sizeType: RESPONSIVE_SIZE) {
@@ -123,11 +150,13 @@ export class DynamicPageHeaderComponent implements OnInit, AfterViewInit, OnDest
         if (this._isCollapsibleCollapsed()) {
             this._setStyleToHostElement('z-index', 1);
         }
+        this._calculateExpandCollapseAriaLabel();
+        this._calculatePinUnpinAriaLabel();
     }
     /** @hidden */
     ngAfterViewInit(): void {
-        if (this.background) {
-            this._setBackgroundStyles(this.background);
+        if (this._background) {
+            this._setBackgroundStyles(this._background);
         }
         if (this.size) {
             this._setSize(this.size);
@@ -154,10 +183,18 @@ export class DynamicPageHeaderComponent implements OnInit, AfterViewInit, OnDest
             this._setStyleToHostElement('z-index', 1);
         } else {
             this._removeStyleFromHostElement('z-index');
+            // reset the styles TODO not working correctly
+            if (this._background) {
+                this._setBackgroundStyles(this._background);
+            }
+            if (this.size) {
+                this._setSize(this.size);
+            }
         }
         const event = new DynamicPageCollapseChangeEvent(this, this.collapsed);
         // this._dynamicPageService.toggleHeader(this.collapsed);
         this.collapseChange.emit(event);
+        this._calculateExpandCollapseAriaLabel();
     }
 
     // scenarioi where collapsible = false and pinnable = true is buggy due to html viisibility
@@ -179,6 +216,8 @@ export class DynamicPageHeaderComponent implements OnInit, AfterViewInit, OnDest
         } else {
             this._collapsible = this.collapsible; // reset
         }
+        this._calculatePinUnpinAriaLabel();
+
         // else {
         //     // this.collapsible = collapsible;
         // }
@@ -237,6 +276,23 @@ export class DynamicPageHeaderComponent implements OnInit, AfterViewInit, OnDest
             }
         }
     }
+
+    /**
+     * @hidden
+     * Calculate expandAriaLabel based on header
+     */
+    private _calculateExpandCollapseAriaLabel(): void {
+        this.expandCollapseAriaLabel = this.collapsed ? this.expandLabel : this.collapseLabel;
+    }
+
+    /**
+     * @hidden
+     * Calculate pinUnpinAriaLabel based on header
+     */
+    private _calculatePinUnpinAriaLabel(): void {
+        this.pinUnpinAriaLabel = this._isPinned() ? this.unpinAriaLabel : this.pinAriaLabel;
+    }
+
     /**@hidden */
     private _addClassNameToHostElement(className: string): void {
         this._renderer.addClass(this._elementRef.nativeElement, className);

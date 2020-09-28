@@ -16,6 +16,9 @@ export class DynamicPageConfig {
      */
     collapseLabel = 'Collapse Header';
 
+    pinLabel = 'Pin Header';
+    unpinLabel = 'Unpin Header';
+
     /**
      * Create Provider factory function
      */

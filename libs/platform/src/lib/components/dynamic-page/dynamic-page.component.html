@@ -1,5 +1,5 @@
 <!-- <ng-container> -->
-<div class="fd-dynamic-page" role="region" aria-label="Dynamic Page Desktop Example">
+<div class="fd-dynamic-page" [attr.aria-label]="ariaLabel">
     <div (click)="toggleCollapse()">
         <ng-content select="fdp-dynamic-page-title"></ng-content>
     </div>

@@ -1,6 +1,6 @@
 <!-- <fdp-dynamic-page></fdp-dynamic-page> -->
 <!-- <div> -->
-<fdp-dynamic-page background="list" size="medium">
+<fdp-dynamic-page background="transparent" size="medium" ariaLabel="Example Dynamic Page">
     <fdp-dynamic-page-title [title]="'Page Title'" [subtitle]="'Page Summary'">
         <!-- breadcrumb content -->
         <fd-breadcrumb>
@@ -69,7 +69,7 @@
         </fdp-dynamic-page-layout-actions>
     </fdp-dynamic-page-title>
     <fdp-dynamic-page-header
-        [collapsible]="false"
+        [collapsible]="true"
         [pinnable]="true"
         [collapsed]="false"
         (collapseChange)="onCollapseChange($event)"

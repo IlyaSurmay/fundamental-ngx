@@ -11,7 +11,7 @@ export const CLASS_NAME = {
     dynamicPageTitleContainer: 'fd-dynamic-page__title-container',
     dynamicPageTitle: 'fd-dynamic-page__title',
     dynamicPageKeyInfo: 'fd-dynamic-page__title-content',
-    dynamicPageSubtitle: 'fd-dynamic-page__header',
+    // dynamicPageSubtitle: 'fd-dynamic-page__header',
     dynamicPageGlobalActions: 'fd-dynamic-page__toolbar',
     dynamicPageLayoutActions: 'fd-dynamic-page__toolbar--actions',
     dynamicPageHeader: 'fd-dynamic-page__header',
