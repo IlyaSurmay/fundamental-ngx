@@ -2,7 +2,7 @@
     class="fd-dynamic-page__header"
     [attr.aria-label]="headerAriaLabel"
     *ngIf="!collapsed"
-    id="fddplhvc1"
+    [attr.id]="id"
     #headerContent
 >
     <ng-content></ng-content>
@@ -16,7 +16,7 @@
             [attr.title]="expandCollapseAriaLabel"
             [attr.aria-expanded]="!collapsed"
             aria-haspopup="true"
-            aria-controls="fddplhvc1"
+            [attr.aria-controls]="id"
             *ngIf="collapsible && !pinned"
             (click)="toggleCollapse()"
         >
@@ -30,7 +30,6 @@
             [attr.aria-selected]="pinned"
             (click)="onPinned()"
             *ngIf="pinnable"
-            #pinBtn
         >
             <i class="sap-icon--pushpin-off"></i>
         </button>

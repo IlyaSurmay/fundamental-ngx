@@ -8,60 +8,76 @@
     <!-- <ng-container *ngTemplateOutlet="tabbedContainer"></ng-container>
     <ng-content select="fdp-dynamic-page-content"></ng-content> -->
     <!-- <ng-template *ngIf="isTabbed; else normal"> -->
+    <!-- <ng-container *ngIf="isTabbed"> -->
+    <!-- <ng-content select="fdp-dynamic-page-tabbed-content"></ng-content> -->
+    <!-- <fdp-dynamic-page-tabbed-content>
+            <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+        </fdp-dynamic-page-tabbed-content>
+    </ng-container> -->
     <div class="fd-dynamic-page__tabs fd-dynamic-page__tabs--overflow" *ngIf="isTabbed">
         <fd-tab-list
             size="xl"
             class="fd-dynamic-page__tabs fd-dynamic-page__tabs--xl fd-dynamic-page__tabs--add-shadow"
         >
             <ng-container *ngFor="let tab of _tabs; let i = index">
-                <fd-tab [title]="tab.tabLabel ? tab.tabLabel : ''">
+                <fd-tab [title]="tab.tabLabel">
                     <!-- <ng-template fd-tab-title-template>
                     <span fd-tab-tag>
                         {{ tab.tabTitle.title }}
                     </span>
                 </ng-template> -->
-                    <!-- {{ item.childContent }} -->
-                    <!-- <ng-container *ngFor="let content of _tabContent"> -->
-                    <!-- {{ tabbedItem._tabContent }} -->
-                    <!-- <ng-container *ngTemplateOutlet="item.childContent"></ng-container> -->
-                    <!-- <ng-container [ngTemplateOutlet]="tabbedItem.childContent."></ng-container> -->
-                    <!-- <div
+                    <div class="fd-dynamic-page__content">
+                        <ng-container *ngTemplateOutlet="tab.contentTemplate"></ng-container>
+                    </div>
+                </fd-tab>
+            </ng-container>
+        </fd-tab-list>
+    </div>
+    <!-- {{ item.childContent }} -->
+    <!-- <ng-container *ngFor="let content of _tabContent"> -->
+    <!-- {{ tabbedItem._tabContent }} -->
+    <!-- <ng-container *ngTemplateOutlet="item.childContent"></ng-container> -->
+    <!-- <ng-container [ngTemplateOutlet]="tabbedItem.childContent."></ng-container> -->
+    <!-- <div
                         class="fd-dynamic-page__content fd-dynamic-page__content--xl"
                         style="height: 20rem; overflow: scroll;"
                         #dynPage
                         cdk-scrollable
                         (scroll)="onElementScroll($event)"
                     > -->
-                    <!-- (scroll)="onElementScroll($event)" -->
-                    <!-- <ng-content #contentDyn></ng-content> -->
-                    <!-- <fdp-dynamic-page-content *ngIf="!_content" cdkScrollable>
+    <!-- (scroll)="onElementScroll($event)" -->
+    <!-- <ng-content #contentDyn></ng-content> -->
+    <!-- <fdp-dynamic-page-content *ngIf="!_content" cdkScrollable>
                             <ng-content></ng-content>
                         </fdp-dynamic-page-content> -->
-                    <!-- <ng-content select="fdp-dynamic-page-content"></ng-content> -->
-                    <!-- <fdp-dynamic-page-content></fdp-dynamic-page-content> -->
-                    <!-- </div> -->
-                    <!-- kakoooooo -->
-                    <!-- <ng-template><ng-content select="fdp-dynamic-page-content"></ng-content></ng-template> -->
-                    <!-- <ng-content select="[id=fd-tab-panel{{ i }}]"></ng-content> -->
-                    <!-- </ng-container> -->
-                    <!-- {{ tabbedItem._tabContent }} -->
-                    <!-- <ng-container *ngTemplateOutlet="tabbedItem.childContent"></ng-container> -->
-                    <!-- <ng-container [ngTemplateOutlet]="tabbedItem.childContent."></ng-container> -->
-                    <!-- <ng-content select="fdp-dynamic-page-content"></ng-content> -->
-                    <!-- <ng-content select="[id=fd-tab-panel{{ i }}]"></ng-content> -->
-                    <!-- <fdp-dynamic-page-content> -->
-                    <!-- <ng-content select="fdp-dynamic-page-content"></ng-content> -->
-                    <fdp-dynamic-page-content>
-                        <ng-container *ngTemplateOutlet="tab.contentTemplateRef"></ng-container>
-                    </fdp-dynamic-page-content>
-                    <!-- </fdp-dynamic-page-content> -->
-                </fd-tab>
-                <!-- <ng-content #dynPage select="fdp-dynamic-page-content"></ng-content> -->
-            </ng-container>
+    <!-- <ng-content select="fdp-dynamic-page-content"></ng-content> -->
+    <!-- <fdp-dynamic-page-content></fdp-dynamic-page-content> -->
+    <!-- </div> -->
+    <!-- kakoooooo -->
+    <!-- <ng-template><ng-content select="fdp-dynamic-page-content"></ng-content></ng-template> -->
+    <!-- <ng-content select="[id=fd-tab-panel{{ i }}]"></ng-content> -->
+    <!-- </ng-container> -->
+    <!-- {{ tabbedItem._tabContent }} -->
+    <!-- <ng-container *ngTemplateOutlet="tab.contentTemplate"></ng-container> -->
+    <!-- <ng-container [ngTemplateOutlet]="tabbedItem.childContent."></ng-container> -->
+    <!-- <ng-content select="fdp-dynamic-page-content"></ng-content> -->
+    <!-- <ng-content select="[id=fd-tab-panel{{ i }}]"></ng-content> -->
+    <!-- <fdp-dynamic-page-content> -->
+    <!-- <ng-content select="fdp-dynamic-page-content"></ng-content> -->
+    <!-- <fdp-dynamic-page-content> -->
+    <!-- <ng-container *ngTemplateOutlet="tab.contentTemplate"></ng-container> -->
+    <!-- </fdp-dynamic-page-content> -->
+    <!-- </fdp-dynamic-page-content> -->
+    <!-- </fd-tab> -->
+    <!-- <ng-content #dynPage select="fdp-dynamic-page-content"></ng-content> -->
+    <!-- </ng-container>
         </fd-tab-list>
-    </div>
+    </div> -->
     <ng-container *ngIf="!isTabbed">
         <ng-content select="fdp-dynamic-page-content"></ng-content>
+        <!-- <fdp-dynamic-page-content> -->
+        <!-- <ng-container *ngTemplateOutlet="_userContent?.contentTemplate"></ng-container> -->
+        <!-- </fdp-dynamic-page-content> -->
     </ng-container>
     <!-- </ng-template> -->
     <!-- <ng-container #normal>

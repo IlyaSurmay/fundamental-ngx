@@ -1,63 +1,10 @@
-<!-- <ng-container *ngTemplateOutlet="mobile ? mobileTemplate : desktopTemplate"></ng-container> -->
-
-<!-- <ng-container *ngIf="tabLabel; else default"> -->
-<!-- <div class="fd-dynamic-page__tabs--overflow">
-    <ul
-        class="fd-tabs fd-tabs--l fd-dynamic-page__tabs fd-dynamic-page__tabs--xl fd-dynamic-page__tabs--add-shadow"
-        role="tablist"
-    >
-        <li role="listitem" class="fd-tabs__item">
-            <a class="fd-tabs__link" aria-controls="fuCwV550" aria-selected="true" href="#fuCwV550" role="tab">
-                <span class="fd-tabs__tag">
-                    {{ tabLabel }}
-                </span>
-            </a>
-        </li>
-        <li role="listitem" class="fd-tabs__item">
-            <a class="fd-tabs__link" aria-controls="AiWfz165" href="#AiWfz165" role="tab">
-                <span class="fd-tabs__tag">
-                    Selected
-                </span>
-            </a>
-        </li>
-    </ul>
-</div>
-<div
-    class="fd-dynamic-page__content fd-dynamic-page__content--xl"
-    style="height: 20rem; overflow: scroll;"
-    cdkScrollable
->
-    <div class="fd-tabs__panel" aria-expanded="true" id="fuCwV550" role="tabpanel">
-        <ng-content></ng-content>
-    </div>
-    <div class="fd-tabs__panel" aria-expanded="false" id="AiWfz165" role="tabpanel">
-        Dolor sit Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius assumenda, quidem natus optio
-        repudiandae deleniti in atque quis, sed cum asperiores minus rerum incidunt unde quod fuga amet ea
-        reprehenderit. Dolor sit Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius assumenda, quidem natus
-        optio repudiandae deleniti in atque quis, sed cu
-    </div>
-</div> -->
-
-<!-- <fd-tab-list>
-    <fd-tab *ngIf="tabLabel; else default" [title]="tabLabel">
-        <ng-content></ng-content>
-    </fd-tab>
-</fd-tab-list> -->
-<!-- </ng-container> -->
-
-<!-- <ng-container *ngIf="tabLabel; else default">
-    <ng-content></ng-content>
+<!-- <ng-content></ng-content> -->
+<ng-container *ngIf="tabLabel">
+    <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
 </ng-container>
-<ng-container #default> -->
-<ng-content></ng-content>
-<!-- <ng-container *ngIf="tabLabel">
-    <ng-template #tabbed>
-        <ng-content></ng-content>
-    </ng-template>
-</ng-container> -->
-<!-- </ng-container> -->
-<!-- <div #dynPage (scroll)="onElementScroll($event)">
-    blasfjkafjajnf Lorem ipsum dolor sit amet consectetur adipisicing elit. Vel laboriosam aperiam adipisci, quis
-    excepturi, temporibus nesciunt placeat numquam beatae quaerat corporis enim expedita consequatur nisi, provident
-    explicabo maiores. Quidem, modi.
-</div> -->
+
+<ng-container *ngIf="!tabLabel">
+    <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+</ng-container>
+<!-- <ng-template #contentTpl><ng-content></ng-content></ng-template> -->
+<ng-template #contentTemplate><ng-content></ng-content></ng-template>

@@ -40,8 +40,24 @@
         <fdp-dynamic-page-global-actions>
             <!-- global actions -->
             <fd-toolbar [fdType]="'transparent'" [clearBorder]="true">
-                <button fd-toolbar-item fd-button [compact]="true" [fdType]="'positive'">Accept</button>
-                <button fd-toolbar-item fd-button [compact]="true" [fdType]="'negative'">Reject</button>
+                <button
+                    fd-toolbar-item
+                    fd-button
+                    [compact]="true"
+                    [fdType]="'positive'"
+                    (click)="$event.stopPropagation()"
+                >
+                    Accept
+                </button>
+                <button
+                    fd-toolbar-item
+                    fd-button
+                    [compact]="true"
+                    [fdType]="'negative'"
+                    (click)="$event.stopPropagation()"
+                >
+                    Reject
+                </button>
                 <!-- <button fd-toolbar-item fd-button [compact]="true">Button</button>
                 <button
                     fd-toolbar-item
@@ -56,13 +72,13 @@
         <fdp-dynamic-page-layout-actions>
             <!-- layout actions -->
             <fd-toolbar [fdType]="'transparent'" [clearBorder]="true">
-                <button fd-button [fdType]="'transparent'" aria-label="Survey">
+                <button fd-button [fdType]="'transparent'" aria-label="Survey" (click)="surveyClicked($event)">
                     <i class="sap-icon--survey"></i>
                 </button>
-                <button fd-button [fdType]="'transparent'" aria-label="Pool">
+                <button fd-button [fdType]="'transparent'" aria-label="Pool" (click)="$event.stopPropagation()">
                     <i class="sap-icon--pool"></i>
                 </button>
-                <button fd-button [fdType]="'transparent'" aria-label="Chart">
+                <button fd-button [fdType]="'transparent'" aria-label="Chart" (click)="$event.stopPropagation()">
                     <i class="sap-icon--pie-chart"></i>
                 </button>
             </fd-toolbar>

@@ -11,10 +11,12 @@ import {
     OnInit,
     Renderer2,
     TemplateRef,
-    ViewChild
+    ViewChild,
+    ContentChild
 } from '@angular/core';
 import { BACKGROUND_TYPE, CLASS_NAME, DYNAMIC_PAGE_CHILD_TOKEN, RESPONSIVE_SIZE } from '../constants';
 import { DynamicPageService } from '../dynamic-page.service';
+import { TabPanelComponent } from '@fundamental-ngx/core';
 
 @Component({
     selector: 'fdp-dynamic-page-content',
@@ -40,6 +42,10 @@ export class DynamicPageContentComponent extends CdkScrollable implements OnInit
     // get tabLabel(): string {
     //     return this._label;
     // }
+
+    @Input()
+    activeTab = 0;
+
     private _label: string;
     @ViewChild(CdkScrollable)
     cdkScrollable: CdkScrollable;
@@ -51,8 +57,22 @@ export class DynamicPageContentComponent extends CdkScrollable implements OnInit
     isVisible = true;
 
     /** @hidden */
-    @ViewChild('tabbed')
-    contentTemplateRef: TemplateRef<any>;
+    // @ViewChild('tabbed')
+    // contentTemplateRef: TemplateRef<any>;
+    /** @hidden */
+    // @ViewChild('contentTpl')
+    // contentTemplate: TemplateRef<any>;
+
+    // @ViewChild('contentTemplate')
+    // contentTemplate: TemplateRef<any>;
+
+    @ViewChild(TemplateRef) contentTemplate: TemplateRef<any>;
+
+    /** @hidden */
+    @ViewChild(TabPanelComponent)
+    content: TabPanelComponent;
+
+    tab: TabPanelComponent;
 
     _background: BACKGROUND_TYPE;
 
@@ -81,11 +101,11 @@ export class DynamicPageContentComponent extends CdkScrollable implements OnInit
         return this._size;
     }
     constructor(
-        private _elementRef: ElementRef<HTMLElement>,
-        private _renderer: Renderer2,
+        public _elementRef: ElementRef<HTMLElement>,
+        public _renderer: Renderer2,
         public scrollDispatcher: ScrollDispatcher,
-        private zone: NgZone,
-        private _dynamicPageService: DynamicPageService
+        public zone: NgZone,
+        public _dynamicPageService: DynamicPageService
     ) {
         super(_elementRef, scrollDispatcher, zone);
         // this._setAttributeToHostElement('cdkScrollable', '');
@@ -109,17 +129,24 @@ export class DynamicPageContentComponent extends CdkScrollable implements OnInit
         if (this.background) {
             this._setBackgroundStyles(this.background);
         }
-        if (this.tabLabel) {
-            // add tabbed content
-            // todo add to the fd-tab class properly
-            // this._addClassNameToHostElement(CLASS_NAME.dynamicPageTabs);
-            this._removeClassNameToHostElement(CLASS_NAME.dynamicPageContent);
-            // this._addClassNameToHostElement(CLASS_NAME.dynamicPageTabsExtraLarge);
-            // this._removeClassNameToHostElement(CLASS_NAME.dynamicPageContentExtraLarge);
-
-            // this._setStyleToHostElement('overflow', 'scroll');
+        if (this.size) {
+            this._setSize(this.size);
         }
+        // if (this.tabLabel) {
+        // add tabbed content
+        // todo add to the fd-tab class properly
+        // this._addClassNameToHostElement(CLASS_NAME.dynamicPageTabs);
+        // this._removeClassNameToHostElement(CLASS_NAME.dynamicPageContent);
+        // this._addClassNameToHostElement(CLASS_NAME.dynamicPageTabsExtraLarge);
+        // this._removeClassNameToHostElement(CLASS_NAME.dynamicPageContentExtraLarge);
+
+        // this._setStyleToHostElement('overflow', 'scroll');
+        // }
     }
+
+    // ngAfterViewInit(): void{
+    //     this.content.expanded =
+    // }
 
     _setBackgroundStyles(background: BACKGROUND_TYPE): any {
         switch (background) {
@@ -239,19 +266,19 @@ export class DynamicPageContentComponent extends CdkScrollable implements OnInit
         this.scrollDispatcher.deregister(this.cdkScrollable);
     }
     /**@hidden */
-    private _addClassNameToHostElement(className: string): void {
+    protected _addClassNameToHostElement(className: string): void {
         this._renderer.addClass(this._elementRef.nativeElement, className);
     }
     /**@hidden */
-    private _removeClassNameToHostElement(className: string): void {
+    protected _removeClassNameToHostElement(className: string): void {
         this._renderer.removeClass(this._elementRef.nativeElement, className);
     }
     /**@hidden */
-    private _setAttributeToHostElement(attribute: string, value: any): void {
+    protected _setAttributeToHostElement(attribute: string, value: any): void {
         this._renderer.setAttribute(this._elementRef.nativeElement, attribute, value);
     }
     /**@hidden */
-    private _setStyleToHostElement(attribute: string, value: any): void {
+    protected _setStyleToHostElement(attribute: string, value: any): void {
         this._renderer.setStyle(this._elementRef.nativeElement, attribute, value);
     }
 }

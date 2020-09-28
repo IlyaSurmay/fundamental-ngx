@@ -8,4 +8,8 @@ export class PlatformDynamicPageExampleComponent {
     onCollapseChange(event: Event): any {
         console.log('collapse changed');
     }
+
+    surveyClicked(event: Event): any {
+        event.stopPropagation();
+    }
 }

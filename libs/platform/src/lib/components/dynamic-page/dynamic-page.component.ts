@@ -26,7 +26,6 @@ import { BaseComponent } from '../base';
 import { CLASS_NAME, DYNAMIC_PAGE_CHILD_TOKEN, BACKGROUND_TYPE, RESPONSIVE_SIZE } from './constants';
 import { DynamicPageContentComponent } from './dynamic-page-content/dynamic-page-content.component';
 import { DynamicPageService } from './dynamic-page.service';
-import { DynamicPageTabbedContentComponent } from './dynamic-page-content/dynamic-page-tabbed-content.component';
 import { DynamicPageHeaderComponent } from './dynamic-page-header/header/dynamic-page-header.component';
 import { DynamicPageTitleComponent } from './dynamic-page-header/title/dynamic-page-title.component';
 import { Subscription } from 'rxjs';
@@ -41,9 +40,8 @@ let dynamicPageId = 0;
     encapsulation: ViewEncapsulation.None,
     providers: [DynamicPageService]
 })
-export class DynamicPageComponent extends BaseComponent
-    implements OnInit, AfterContentInit, AfterViewInit, AfterViewChecked, OnDestroy {
-    @ContentChildren(DYNAMIC_PAGE_CHILD_TOKEN as any, { descendants: true })
+export class DynamicPageComponent extends BaseComponent implements OnInit, AfterContentInit, AfterViewInit, OnDestroy {
+    @ContentChildren(DynamicPageContentComponent, { descendants: true })
     tabbedContent: QueryList<DynamicPageContentComponent>;
 
     toggledVal = false;
@@ -58,8 +56,8 @@ export class DynamicPageComponent extends BaseComponent
     @HostBinding('attr.role')
     role = 'region';
 
-    _tabs: DynamicPageContentComponent[] = [];
     // _content: DynamicPageTabbedContentComponent[] = [];
+    _tabs: DynamicPageContentComponent[] = [];
 
     isTabbed = false;
     @ContentChild(DynamicPageHeaderComponent)
@@ -71,15 +69,17 @@ export class DynamicPageComponent extends BaseComponent
     @ViewChild(DynamicPageContentComponent)
     _userContent: DynamicPageContentComponent;
 
-    @ContentChild(DynamicPageContentComponent) _childcontent: DynamicPageContentComponent;
+    @ContentChild(DynamicPageContentComponent) childcontent: DynamicPageContentComponent;
 
     /** Reference to the CdkScrollable instance that wraps the scrollable content. */
     get scrollable(): CdkScrollable {
-        return this._userContent || this._childcontent;
+        return this._userContent || this.childcontent;
     }
     // @ViewChild('dynPage')
     // childDiv: ElementRef;
+    tabLabels: string[];
 
+    _tabListComponentElementRef: ElementRef<HTMLElement>;
     @Input()
     ariaLabel: string;
 
@@ -95,8 +95,13 @@ export class DynamicPageComponent extends BaseComponent
     /** @hidden */
     @ContentChild(TabListComponent, { read: ElementRef })
     set tabListElementRef(tabListComponentElementRef: ElementRef<HTMLElement>) {
+        console.log('in here ******' + tabListComponentElementRef);
+        this._tabListComponentElementRef = tabListComponentElementRef;
         this._setTabListElementClass(tabListComponentElementRef?.nativeElement);
     }
+
+    @Input()
+    summaryLine: string;
 
     @Input()
     background: BACKGROUND_TYPE = 'solid';
@@ -151,27 +156,55 @@ export class DynamicPageComponent extends BaseComponent
     /** @hidden */
     ngAfterContentInit(): void {
         this._listenToChildrenQueryListChanges();
-        console.log('header component height is' + this.headerComponent?.elementRef().nativeElement.offsetHeight);
+        // console.log('header component height is' + this.headerComponent?.elementRef().nativeElement.offsetHeight);
         if (this.background) {
             this.titleComponent.background = this.background;
             this.headerComponent.background = this.background;
-            this._childcontent.background = this.background;
+            this.childcontent.background = this.background;
         }
         if (this.size) {
             this.titleComponent.size = this.size;
             this.headerComponent.size = this.size;
-            this._childcontent.size = this.size;
+            this.childcontent.size = this.size; // todo need contentchildren for getting thiis to work on all chiildren contents
         }
     }
 
-    ngAfterViewChecked(): void {
-        console.log('ngAfterViewChecked');
-        // if (this.headerComponent?.collapsible) {
+    // ngAfterViewChecked(): void {
+    //     console.log('ngAfterViewChecked');
+    //     // if (this.headerComponent?.collapsible) {
 
-        // }
-    }
+    //     // }
+    // }
+
+    // /** @hidden */
+    // private _setContentTemplate(): void {
+    //     this.childrenContent.forEach((child) => {
+    //         if (child.activeTab === 0) {
+    //             this.contentTemplate = child.contentTemplateRef;
+    //         }
+    //     });
+    // }
 
     ngAfterViewInit(): void {
+        // this.childrenContent.forEach((child) => {
+        //     if (child.tabLabel) {
+        //         this.isTabbed = true;
+        //         this._tabContent.tabLabels.push(child.tabLabel);
+        //     }
+        // });
+        this._listenToChildrenQueryListChanges();
+
+        this._subscriptions.add(
+            this.tabbedContent.changes.subscribe(() => {
+                this._listenToChildrenQueryListChanges();
+                //     this.childrenContent.forEach((child) => {
+                //         if (child.tabLabel) {
+                //             this.isTabbed = true;
+                //             this._tabContent.tabLabels.push(child.tabLabel);
+                //         }
+                //     });
+            })
+        );
         if (this.headerComponent?.collapsible) {
             if (!this.scrollDispatcher.scrollContainers.has(this.scrollable)) {
                 this.scrollDispatcher.register(this.scrollable);
@@ -220,6 +253,10 @@ export class DynamicPageComponent extends BaseComponent
                 });
             }
         }
+        this._setTabListElementClass(this._tabListComponentElementRef?.nativeElement);
+
+        this._cd.detectChanges();
+
         // this.scrollDispatcher.ancestorScrolled(this.childDiv).subscribe((scrollable: CdkScrollable) => {
         //     if (scrollable) {
         //         console.log('The ancestor has scrolled, from:');
@@ -346,7 +383,7 @@ export class DynamicPageComponent extends BaseComponent
         this._renderer.addClass(tabList, CLASS_NAME.dynamicPageTabsAddShadow);
     }
 
-    /** @hidden */
+    // /** @hidden */
     private _listenToChildrenQueryListChanges(): void {
         this.tabbedContent.changes.pipe(startWith(this.tabbedContent)).subscribe(() => {
             this._createContent();
@@ -367,19 +404,31 @@ export class DynamicPageComponent extends BaseComponent
                 if (!contentItem.tabLabel) {
                     // return;
                     this.isTabbed = false;
+                    // this.contentTemplate = contentItem.contentTemplate;
                     // this._content.push(contentItem);
                 } else {
                     this.isTabbed = true;
                     this._tabs.push(contentItem);
+                    if (contentItem.activeTab === index) {
+                        console.log('active is ' + index);
+                        this.contentTemplate = contentItem.contentTemplate;
+                    }
                 }
             });
         }
-        console.log(this._tabs.length);
+        console.log(this.contentTemplate);
+
+        // this.tabbedContent.forEach((tabItem) => {
+        //     if (tabItem.tab.expanded) { // if this tab is opened
+        //         this.contentTemplate = tabItem.content.contentTemplate;
+        //     }
+        // });
     }
     ngOnDestroy(): void {
         this.scrollDispatcher.deregister(this.scrollable);
         this.toggleSubscription.unsubscribe();
         this.scrollSubscription.unsubscribe();
+        this._subscriptions.unsubscribe();
     }
 
     /**@hidden */

@@ -23,6 +23,7 @@ export class DynamicPageCollapseChangeEvent {
     constructor(public source: DynamicPageHeaderComponent, public payload: boolean) {}
 }
 
+let dynamicPageHeaderId = 0;
 @Component({
     selector: 'fdp-dynamic-page-header',
     templateUrl: './dynamic-page-header.component.html',
@@ -78,6 +79,10 @@ export class DynamicPageHeaderComponent implements OnInit, AfterViewInit, OnDest
     @Input()
     @HostBinding('attr.role')
     role = 'region';
+
+    @Input()
+    @HostBinding('attr.id')
+    id = 'fdp-dynamic-page-header-id-' + dynamicPageHeaderId++;
 
     @Input()
     headerAriaLabel: string;
