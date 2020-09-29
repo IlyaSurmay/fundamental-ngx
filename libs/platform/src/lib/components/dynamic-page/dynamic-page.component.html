@@ -1,5 +1,8 @@
 <!-- <ng-container> -->
-<div class="fd-dynamic-page" [attr.aria-label]="ariaLabel">
+<div class="fd-dynamic-page" [attr.aria-label]="ariaLabel" #pageWindow>
+    <ng-container *ngIf="summaryLine ? true : false">
+        <ng-content select="fdp-dynamic-page-summarized-title"></ng-content>
+    </ng-container>
     <div (click)="toggleCollapse()">
         <ng-content select="fdp-dynamic-page-title"></ng-content>
     </div>
@@ -15,10 +18,7 @@
         </fdp-dynamic-page-tabbed-content>
     </ng-container> -->
     <div class="fd-dynamic-page__tabs fd-dynamic-page__tabs--overflow" *ngIf="isTabbed">
-        <fd-tab-list
-            size="xl"
-            class="fd-dynamic-page__tabs fd-dynamic-page__tabs--xl fd-dynamic-page__tabs--add-shadow"
-        >
+        <fd-tab-list size="xl">
             <ng-container *ngFor="let tab of _tabs; let i = index">
                 <fd-tab [title]="tab.tabLabel">
                     <!-- <ng-template fd-tab-title-template>
@@ -26,9 +26,18 @@
                         {{ tab.tabTitle.title }}
                     </span>
                 </ng-template> -->
-                    <div class="fd-dynamic-page__content">
-                        <ng-container *ngTemplateOutlet="tab.contentTemplate"></ng-container>
-                    </div>
+                    <!-- the below div works but has scrolling issue -->
+                    <!-- <div class="fd-dynamic-page__content" #tabContent> -->
+                    <!-- <fdp-dynamic-page-content #tabContent> -->
+                    <!-- <ng-template fdTemplate="conteent"> -->
+                    <fdp-dynamic-page-tabbed-content [background]="background" [size]="size">
+                        <ng-container
+                            *ngTemplateOutlet="tab.contentTemplate; context: { tabLabel: tabLabel }"
+                        ></ng-container>
+                    </fdp-dynamic-page-tabbed-content>
+                    <!-- </ng-template> -->
+                    <!-- </fdp-dynamic-page-content> -->
+                    <!-- </div> -->
                 </fd-tab>
             </ng-container>
         </fd-tab-list>

@@ -18,18 +18,21 @@ import {
     AfterViewChecked,
     Input,
     HostBinding,
-    TemplateRef
+    TemplateRef,
+    ViewChildren,
+    HostListener
 } from '@angular/core';
-import { TabListComponent } from '@fundamental-ngx/core';
-import { startWith } from 'rxjs/operators';
+import { TabListComponent, KeyUtil } from '@fundamental-ngx/core';
+import { startWith, debounceTime } from 'rxjs/operators';
 import { BaseComponent } from '../base';
 import { CLASS_NAME, DYNAMIC_PAGE_CHILD_TOKEN, BACKGROUND_TYPE, RESPONSIVE_SIZE } from './constants';
 import { DynamicPageContentComponent } from './dynamic-page-content/dynamic-page-content.component';
 import { DynamicPageService } from './dynamic-page.service';
 import { DynamicPageHeaderComponent } from './dynamic-page-header/header/dynamic-page-header.component';
 import { DynamicPageTitleComponent } from './dynamic-page-header/title/dynamic-page-title.component';
-import { Subscription } from 'rxjs';
+import { Subscription, fromEvent } from 'rxjs';
 import { DynamicPageConfig } from './dynamic-page.config';
+import { DynamicPageTabbedContentComponent } from './dynamic-page-content/dynamic-page-tabbed-content.component';
 
 let dynamicPageId = 0;
 @Component({
@@ -60,6 +63,15 @@ export class DynamicPageComponent extends BaseComponent implements OnInit, After
     _tabs: DynamicPageContentComponent[] = [];
 
     isTabbed = false;
+
+    /** @hidden */
+    @ViewChild('pageWindow')
+    windowElement: ElementRef;
+
+    /** Reference to page header content */
+    @ViewChildren('tabContent')
+    tabContent: QueryList<ElementRef<HTMLElement>>;
+
     @ContentChild(DynamicPageHeaderComponent)
     headerComponent: DynamicPageHeaderComponent;
 
@@ -71,6 +83,8 @@ export class DynamicPageComponent extends BaseComponent implements OnInit, After
 
     @ContentChild(DynamicPageContentComponent) childcontent: DynamicPageContentComponent;
 
+    @ViewChild(DynamicPageTabbedContentComponent) childTabContent: DynamicPageTabbedContentComponent;
+
     /** Reference to the CdkScrollable instance that wraps the scrollable content. */
     get scrollable(): CdkScrollable {
         return this._userContent || this.childcontent;
@@ -79,7 +93,7 @@ export class DynamicPageComponent extends BaseComponent implements OnInit, After
     // childDiv: ElementRef;
     tabLabels: string[];
 
-    _tabListComponentElementRef: ElementRef<HTMLElement>;
+    // _tabListComponentElementRef: ElementRef<HTMLElement>;
     @Input()
     ariaLabel: string;
 
@@ -89,16 +103,16 @@ export class DynamicPageComponent extends BaseComponent implements OnInit, After
     scrollSubscription: Subscription;
 
     /** @hidden */
-    @ContentChild(TabListComponent)
-    tabList: TabListComponent; // for adding shadow styles
+    // @ContentChild(TabListComponent)
+    // tabList: TabListComponent; // for adding shadow styles
 
     /** @hidden */
-    @ContentChild(TabListComponent, { read: ElementRef })
-    set tabListElementRef(tabListComponentElementRef: ElementRef<HTMLElement>) {
-        console.log('in here ******' + tabListComponentElementRef);
-        this._tabListComponentElementRef = tabListComponentElementRef;
-        this._setTabListElementClass(tabListComponentElementRef?.nativeElement);
-    }
+    // @ContentChild(TabListComponent, { read: ElementRef })
+    // set tabListElementRef(tabListComponentElementRef: ElementRef<HTMLElement>) {
+    //     console.log('in here ******' + tabListComponentElementRef);
+    //     this._tabListComponentElementRef = tabListComponentElementRef;
+    //     this._setTabListElementClass(tabListComponentElementRef?.nativeElement);
+    // }
 
     @Input()
     summaryLine: string;
@@ -161,11 +175,15 @@ export class DynamicPageComponent extends BaseComponent implements OnInit, After
             this.titleComponent.background = this.background;
             this.headerComponent.background = this.background;
             this.childcontent.background = this.background;
+            // this.childTabContent.background = this.background;
+            this._addStylesToElement(this.background);
         }
         if (this.size) {
             this.titleComponent.size = this.size;
             this.headerComponent.size = this.size;
             this.childcontent.size = this.size; // todo need contentchildren for getting thiis to work on all chiildren contents
+            // this.childTabContent.size = this.size;
+            this._addStylesToElement(this.size);
         }
     }
 
@@ -192,11 +210,20 @@ export class DynamicPageComponent extends BaseComponent implements OnInit, After
         //         this._tabContent.tabLabels.push(child.tabLabel);
         //     }
         // });
+        // this._addClassNameToHostElement(CLASS_NAME.dynamicPage);
+        if (this.background) {
+            this._addStylesToElement(this.background);
+        }
+        if (this.size) {
+            this._addStylesToElement(this.size);
+        }
         this._listenToChildrenQueryListChanges();
 
         this._subscriptions.add(
             this.tabbedContent.changes.subscribe(() => {
                 this._listenToChildrenQueryListChanges();
+                this._setTabStyles();
+
                 //     this.childrenContent.forEach((child) => {
                 //         if (child.tabLabel) {
                 //             this.isTabbed = true;
@@ -206,55 +233,18 @@ export class DynamicPageComponent extends BaseComponent implements OnInit, After
             })
         );
         if (this.headerComponent?.collapsible) {
-            if (!this.scrollDispatcher.scrollContainers.has(this.scrollable)) {
-                this.scrollDispatcher.register(this.scrollable);
-                console.log(this.scrollDispatcher.scrollContainers);
-                const scrollContainers = this.scrollDispatcher.getAncestorScrollContainers(
-                    this.scrollable.getElementRef()
-                );
-                // console.log('ancestor');
-                // gettinig the iincorrect scrollable here.. what changed?
-                // console.log(scrollContainers);
-                scrollContainers.forEach((element) => {
-                    if (element !== this.scrollable) {
-                        // console.log('deregisteerring ' + element.getElementRef().nativeElement.id);
-
-                        this.scrollDispatcher.deregister(element);
-                    }
-                });
-                // console.log(this.scrollDispatcher.scrollContainers);
-                this.scrollSubscription = this.scrollDispatcher.scrolled(10).subscribe((cdk: CdkScrollable) => {
-                    this.zone.run(() => {
-                        // Your update here!
-                        console.log('scrolled');
-                        console.log(cdk);
-
-                        // improperly used, currently detecting doc scroll.
-                        // console.log(
-                        //     'header component now height is' + this.headerComponent?.elementRef().nativeElement.offsetHeight
-                        // );
-                        // console.log(this.headerComponent?.collapsible + ' collapsiiblee?');
-
-                        const scrollPosition = cdk.measureScrollOffset('top');
-                        console.log(scrollPosition);
-                        if (scrollPosition > 0) {
-                            console.log('collapsing header');
-
-                            // this._dynamicPageService.toggleHeader(!this.toggledVal);
-                            this._dynamicPageService.collapseHeader();
-                        } else {
-                            // if (this.toggledVal) {
-                            this._dynamicPageService.expandHeader();
-                            // } else {
-                            //     this._dynamicPageService.collapseHeader();
-                            // }
-                        }
-                    });
-                });
-            }
+            this.snapOnScroll();
         }
-        this._setTabListElementClass(this._tabListComponentElementRef?.nativeElement);
 
+        this._setTabStyles();
+        // this._setTabListElementClass(this._tabListComponentElementRef?.nativeElement);
+        // if (this.background) {
+        //     this._setContentBackgroundStyles(this.background);
+        // }
+        // if (this.size) {
+        //     this._setContentSize(this.size);
+        // }
+        // this._listenOnWindowResize();
         this._cd.detectChanges();
 
         // this.scrollDispatcher.ancestorScrolled(this.childDiv).subscribe((scrollable: CdkScrollable) => {
@@ -367,11 +357,207 @@ export class DynamicPageComponent extends BaseComponent implements OnInit, After
         //     });
         // }
     }
+    snapOnScroll(): void {
+        if (!this.scrollDispatcher.scrollContainers.has(this.scrollable)) {
+            this.scrollDispatcher.register(this.scrollable);
+            console.log(this.scrollDispatcher.scrollContainers);
+            const scrollContainers = this.scrollDispatcher.getAncestorScrollContainers(this.scrollable.getElementRef());
+            // console.log('ancestor');
+            // gettinig the iincorrect scrollable here.. what changed?
+            // console.log(scrollContainers);
+            scrollContainers.forEach((element) => {
+                if (element !== this.scrollable) {
+                    // console.log('deregisteerring ' + element.getElementRef().nativeElement.id);
+
+                    this.scrollDispatcher.deregister(element);
+                }
+            });
+            // console.log(this.scrollDispatcher.scrollContainers);
+            this.scrollSubscription = this.scrollDispatcher.scrolled(10).subscribe((cdk: CdkScrollable) => {
+                this.zone.run(() => {
+                    // Your update here!
+                    console.log('scrolled');
+                    console.log(cdk);
+
+                    // improperly used, currently detecting doc scroll.
+                    // console.log(
+                    //     'header component now height is' + this.headerComponent?.elementRef().nativeElement.offsetHeight
+                    // );
+                    // console.log(this.headerComponent?.collapsible + ' collapsiiblee?');
+
+                    const scrollPosition = cdk.measureScrollOffset('top');
+                    console.log(scrollPosition);
+                    if (scrollPosition > 20) {
+                        console.log('collapsing header');
+
+                        // this._dynamicPageService.toggleHeader(!this.toggledVal);
+                        this._dynamicPageService.collapseHeader();
+                    } else {
+                        // if (this.toggledVal) {
+                        this._dynamicPageService.expandHeader();
+                        // } else {
+                        //     this._dynamicPageService.collapseHeader();
+                        // }
+                    }
+                });
+            });
+        }
+    }
 
     toggleCollapse(): any {
         console.log('in parent to collapse title');
         this._dynamicPageService.toggleHeader(!this.toggledVal);
         // this.headerComponent.toggleCollapse();
+    }
+
+    _setTabStyles(): void {
+        const tabList = this._elementRef.nativeElement.querySelector('.fd-tabs');
+        if (tabList) {
+            console.log('valid tabs eelement');
+            this._renderer.addClass(tabList, CLASS_NAME.dynamicPageTabs);
+            this._renderer.addClass(tabList, CLASS_NAME.dynamicPageTabsAddShadow);
+            if (this.size) {
+                this._setTabsSize(this.size, tabList);
+            }
+            if (this.background) {
+                console.log('changiing tab content bg here to ' + this.background);
+
+                this.childTabContent.background = this.background;
+            }
+            if (this.headerComponent?.collapsible) {
+                const pinCollapseShadowElement = this._elementRef.nativeElement.querySelector(
+                    '.fd-dynamic-page__header-visibility-container'
+                );
+                if (pinCollapseShadowElement) {
+                    this._renderer.addClass(pinCollapseShadowElement, CLASS_NAME.dynamicPageHeaderPinCollapseNoShadow);
+                }
+            }
+        }
+    }
+    _setContentBackgroundStyles(background: BACKGROUND_TYPE): any {
+        const hostElement = this._elementRef.nativeElement.querySelector('fd-dynamic-page__content');
+        switch (background) {
+            case 'transparent':
+                this._renderer.addClass(hostElement, CLASS_NAME.dynamicPageContentTransparentBg);
+                break;
+            case 'list':
+                this._renderer.addClass(hostElement, CLASS_NAME.dynamicPageContentListBg);
+                break;
+            case 'solid':
+            default:
+                // this._removeClassNameToHostElement(hostElement, CLASS_NAME.dynamicPageContentTransparentBg);
+                // this._removeClassNameToHostElement(hostElement, CLASS_NAME.dynamicPageContentListBg);
+                break;
+        }
+    }
+    _setContentSize(sizeType: RESPONSIVE_SIZE): any {
+        const hostElement = this._elementRef.nativeElement.querySelector('.fd-dynamic-page__content');
+        switch (sizeType) {
+            case 'small':
+                this._renderer.addClass(hostElement, CLASS_NAME.dynamicPageContentAreaSmall);
+                break;
+            case 'medium':
+                this._renderer.addClass(hostElement, CLASS_NAME.dynamicPageContentAreaMedium);
+                break;
+            case 'large':
+                this._renderer.addClass(hostElement, CLASS_NAME.dynamicPageContentAreaLarge);
+                break;
+            case 'extra-large':
+            default:
+                this._renderer.addClass(hostElement, CLASS_NAME.dynamicPageContentAreaExtraLarge);
+                break;
+        }
+    }
+    _setTabsSize(sizeType: RESPONSIVE_SIZE, element: Element): any {
+        switch (sizeType) {
+            case 'small':
+                this._renderer.addClass(element, CLASS_NAME.dynamicPageTabsSmall);
+                break;
+            case 'medium':
+                this._renderer.addClass(element, CLASS_NAME.dynamicPageTabsMedium);
+
+                break;
+            case 'large':
+                this._renderer.addClass(element, CLASS_NAME.dynamicPageTabsLarge);
+                break;
+            case 'extra-large':
+            default:
+                this._renderer.addClass(element, CLASS_NAME.dynamicPageTabsExtraLarge);
+                break;
+        }
+    }
+
+    private _addStylesToElement(property: BACKGROUND_TYPE | RESPONSIVE_SIZE): void {
+        this.tabContent?.forEach((element) => {
+            // this._addClassNameToElement('scroll-tab-container', element);
+            // todo: also remove shadow from header here
+            // this._renderer.addClass(hostElement, CLASS_NAME.dynamicPageContentAreaExtraLarge);
+            // this._addClassNameToElement(CLASS_NAME.dynamicPageContentAreaExtraLarge, element);
+
+            switch (property) {
+                case 'transparent':
+                    if (element) {
+                        this._addClassNameToElement(CLASS_NAME.dynamicPageContentTransparentBg, element);
+                    }
+                    break;
+                case 'list':
+                    if (element) {
+                        this._addClassNameToElement(CLASS_NAME.dynamicPageContentListBg, element);
+                    }
+                    break;
+                case 'small':
+                    if (element) {
+                        this._addClassNameToElement(CLASS_NAME.dynamicPageContentAreaSmall, element);
+                    }
+                    break;
+                case 'medium':
+                    if (element) {
+                        this._addClassNameToElement(CLASS_NAME.dynamicPageContentAreaMedium, element);
+                    }
+                    break;
+                case 'large':
+                    if (element) {
+                        this._addClassNameToElement(CLASS_NAME.dynamicPageContentAreaLarge, element);
+                    }
+                    break;
+                case 'extra-large':
+                    if (element) {
+                        this._addClassNameToElement(CLASS_NAME.dynamicPageContentAreaExtraLarge, element);
+                    }
+                    break;
+            }
+        });
+    }
+
+    // @HostListener('keydown', ['$event'])
+    handleFocus(event: KeyboardEvent): void {
+        if (KeyUtil.isKey(event, 'Tab')) {
+            // open header here
+            console.log(' open header ((((()))))))');
+        }
+    }
+
+    /** @hidden Listen on window resize and adjust padding */
+    private _listenOnWindowResize(): void {
+        this._subscriptions.add(
+            fromEvent(window, 'resize')
+                .pipe(debounceTime(100))
+                .subscribe(() => this.adjustResponsivePadding())
+        );
+    }
+    /** @hidden Determine Dialog padding size based on Dialogs window width */
+    adjustResponsivePadding(): void {
+        const dialogWidth = this.windowElement.nativeElement.getBoundingClientRect().width;
+        if (dialogWidth < 599) {
+            this.size = 'small';
+        } else if (dialogWidth < 1023) {
+            this.size = 'medium';
+        } else if (dialogWidth < 1439) {
+            this.size = 'large';
+        } else {
+            this.size = 'extra-large';
+        }
+        this._cd.detectChanges();
     }
 
     /** @hidden */
@@ -416,6 +602,7 @@ export class DynamicPageComponent extends BaseComponent implements OnInit, After
                 }
             });
         }
+
         console.log(this.contentTemplate);
 
         // this.tabbedContent.forEach((tabItem) => {
@@ -442,6 +629,9 @@ export class DynamicPageComponent extends BaseComponent implements OnInit, After
     /**@hidden */
     private _removeClassNameToHostElement(className: string): void {
         this._renderer.removeClass(this._elementRef.nativeElement, className);
+    }
+    private _addClassNameToElement(className: string, element: ElementRef<HTMLElement>): void {
+        this._renderer.addClass(element.nativeElement, className);
     }
 }
 

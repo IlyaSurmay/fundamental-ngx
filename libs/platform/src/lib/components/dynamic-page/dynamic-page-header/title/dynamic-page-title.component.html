@@ -7,6 +7,30 @@
         </li>
     </ul> -->
 <!-- todo check if templateref can be taken and class added for breadcrumb -->
+<!-- <ng-container *ngIf="size === 'medium' ? tabletDisplay : normalDisplay"> </ng-container> -->
+<!-- <ng-container *ngIf="size === 'medium'; then tabletDisplay; else normalDisplay"></ng-container> -->
+<!-- <div>
+    <ng-template [ngIf]="size === 'medium'">
+        <ng-container *ngTemplateOutlet="tabletDisplay"></ng-container>
+    </ng-template>
+    <ng-template [ngIf]="size !== 'medium'">
+        <ng-container *ngTemplateOutlet="normalDisplay"></ng-container>
+    </ng-template>
+</div>
+
+<ng-template #tabletDisplay>
+    <div class="fd-dynamic-page__breadcrumb-container">
+        <ng-content select="fd-breadcrumb"></ng-content>
+        <ng-content select="fdp-dynamic-page-layout-actions"></ng-content>
+    </div>
+    <div class="fd-dynamic-page__title-container">
+        <div class="fd-dynamic-page__title">{{ title }}</div>
+        <ng-content select="fdp-dynamic-page-key-info"></ng-content>
+        <ng-content select="fdp-dynamic-page-global-actions"></ng-content>
+    </div>
+</ng-template>
+<ng-template #normalDisplay> -->
+<!-- <div class="fd-dynamic-page__breadcrumb"><ng-content select="fd-breadcrumb"></ng-content></div> -->
 <ng-content select="fd-breadcrumb"></ng-content>
 <div class="fd-dynamic-page__title-container">
     <div class="fd-dynamic-page__title">{{ title }}</div>
@@ -14,22 +38,8 @@
     <ng-content select="fdp-dynamic-page-key-info"></ng-content>
     <ng-content select="fdp-dynamic-page-global-actions"></ng-content>
     <ng-content select="fdp-dynamic-page-layout-actions"></ng-content>
-
-    <!-- <div class="fd-dynamic-page__toolbar fd-toolbar fd-toolbar--clear fd-toolbar--transparent">
-            <button class="fd-button fd-button--compact fd-button--positive">Accept</button>
-            <button class="fd-button fd-button--compact fd-button--reject">Reject</button>
-            <div class="fd-dynamic-page__toolbar--actions fd-toolbar fd-toolbar--clear fd-toolbar--transparent">
-                <button class="fd-button fd-button--transparent" aria-label="Survey">
-                    <i class="sap-icon--survey"></i>
-                </button>
-                <button class="fd-button fd-button--transparent" aria-label="Pool">
-                    <i class="sap-icon--pool"></i>
-                </button>
-                <button class="fd-button fd-button--transparent" aria-label="Chart">
-                    <i class="sap-icon--pie-chart"></i>
-                </button>
-            </div>
-        </div> -->
 </div>
+<!-- </ng-template> -->
 <div class="fd-dynamic-page__subtitle" *ngIf="subtitle">{{ subtitle }}</div>
+
 <!-- </div> -->

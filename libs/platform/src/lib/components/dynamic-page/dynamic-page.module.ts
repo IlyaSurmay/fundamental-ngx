@@ -12,6 +12,7 @@ import { DynamicPageHeaderComponent } from './dynamic-page-header/header/dynamic
 import { DynamicPageKeyInfoComponent } from './dynamic-page-header/key-info/dynamic-page-key-info.component';
 import { DynamicPageTitleComponent } from './dynamic-page-header/title/dynamic-page-title.component';
 import { DynamicPageComponent } from './dynamic-page.component';
+import { DynamicPageSummarizedTitleComponent } from './dynamic-page-header/summarized-title/dynamic-page-summarized-title.component';
 
 @NgModule({
     declarations: [
@@ -23,6 +24,7 @@ import { DynamicPageComponent } from './dynamic-page.component';
         DynamicPageHeaderComponent,
         DynamicPageContentComponent,
         DynamicPageTabbedContentComponent,
+        DynamicPageSummarizedTitleComponent,
         DynamicPageFooterComponent
     ],
     imports: [CommonModule, TabsModule, ScrollingModule, PlatformButtonModule],
@@ -35,6 +37,7 @@ import { DynamicPageComponent } from './dynamic-page.component';
         DynamicPageHeaderComponent,
         DynamicPageContentComponent,
         DynamicPageTabbedContentComponent,
+        DynamicPageSummarizedTitleComponent,
         DynamicPageFooterComponent
     ]
 })

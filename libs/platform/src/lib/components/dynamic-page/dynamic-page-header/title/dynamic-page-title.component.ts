@@ -1,14 +1,20 @@
+import { FocusMonitor } from '@angular/cdk/a11y';
 import {
+    AfterViewInit,
     ChangeDetectionStrategy,
     Component,
     ElementRef,
     Input,
+    NgZone,
     OnInit,
     Renderer2,
-    ViewEncapsulation
+    ViewEncapsulation,
+    ContentChild,
+    ViewChild
 } from '@angular/core';
 import { BACKGROUND_TYPE, CLASS_NAME, RESPONSIVE_SIZE } from '../../constants';
-import { FocusableOption } from '@angular/cdk/a11y';
+import { DynamicPageService } from '../../dynamic-page.service';
+import { BreadcrumbComponent } from '@fundamental-ngx/core';
 
 @Component({
     selector: 'fdp-dynamic-page-title',
@@ -16,7 +22,7 @@ import { FocusableOption } from '@angular/cdk/a11y';
     changeDetection: ChangeDetectionStrategy.OnPush,
     encapsulation: ViewEncapsulation.None
 })
-export class DynamicPageTitleComponent implements OnInit, FocusableOption {
+export class DynamicPageTitleComponent implements OnInit, AfterViewInit {
     @Input()
     set background(backgroundType: BACKGROUND_TYPE) {
         if (backgroundType) {
@@ -40,18 +46,25 @@ export class DynamicPageTitleComponent implements OnInit, FocusableOption {
     get size(): RESPONSIVE_SIZE {
         return this._size;
     }
+
     // toggledVal = false;
     // @ViewChild(DynamicPageHeaderComponent)
     // private headerComponent: DynamicPageHeaderComponent;
 
     /** @hidden */
-    constructor(private _elementRef: ElementRef<HTMLElement>, private _renderer: Renderer2) {
+    constructor(
+        private _elementRef: ElementRef<HTMLElement>,
+        private _renderer: Renderer2,
+        public focusMonitor: FocusMonitor,
+        private _dynamicPageService: DynamicPageService,
+        private _ngZone: NgZone
+    ) {
         // this._dynamicPageService.$toggle.subscribe((val) => {
         //     console.log('subscriibied to dyn page serviicee in content' + val);
         //     this.toggledVal = val;
         // });
     }
-    disabled?: boolean;
+
     @Input()
     title: string;
 
@@ -61,14 +74,34 @@ export class DynamicPageTitleComponent implements OnInit, FocusableOption {
     _background: BACKGROUND_TYPE;
 
     _size: RESPONSIVE_SIZE;
+
+    ngAfterViewInit(): void {
+        this.focusMonitor.monitor(this._elementRef).subscribe((origin) =>
+            this._ngZone.run(() => {
+                console.log('origin iis ' + origin);
+                if (origin === 'keyboard') {
+                    this._dynamicPageService.expandHeader();
+                }
+                //   this.origin = this.formatOrigin(origin);
+                //   this._cdr.markForCheck();
+            })
+        );
+
+        const breadcrumb = this._elementRef.nativeElement.querySelector('fd-breadcrumb');
+        if (breadcrumb) {
+            console.log('valid breadcrum');
+            this._renderer.addClass(breadcrumb, CLASS_NAME.dynamicPageBreadcrumb);
+        }
+    }
+
     getLabel?(): string {
         throw new Error('Method not implemented.');
     }
 
-    focus(): void {
-        this._elementRef.nativeElement.focus();
-        console.log('focused, do somethiing here like opening header');
-    }
+    // focus(): void {
+    //     this._elementRef.nativeElement.focus();
+    //     console.log('focused, do somethiing here like opening header');
+    // }
 
     // toggleCollapse(): any {
     //     console.log('ini tiitle');
@@ -83,6 +116,8 @@ export class DynamicPageTitleComponent implements OnInit, FocusableOption {
     ngOnInit(): void {
         this._addClassNameToHostElement(CLASS_NAME.dynamicPageTitleArea); // not getting this to work right
         this._setAttributeToHostElement('tabindex', 0);
+
+        // this._addFocusListener();
         if (this.background) {
             this._setBackgroundStyles(this.background);
         }
@@ -135,4 +170,9 @@ export class DynamicPageTitleComponent implements OnInit, FocusableOption {
     private _setAttributeToHostElement(attribute: string, value: any): void {
         this._renderer.setAttribute(this._elementRef.nativeElement, attribute, value);
     }
+    // private _addFocusListener(): void {
+    //     this._renderer.listen(this._elementRef.nativeElement, 'focus', (event: Event) => {
+    //         console.log('focused called' + event.type);
+    //     });
+    // }
 }

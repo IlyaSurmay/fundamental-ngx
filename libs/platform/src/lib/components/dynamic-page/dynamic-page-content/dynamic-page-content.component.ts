@@ -125,7 +125,7 @@ export class DynamicPageContentComponent extends CdkScrollable implements OnInit
     }
 
     ngOnInit(): void {
-        this._addClassNameToHostElement(CLASS_NAME.dynamicPageContent);
+        // this._addClassNameToHostElement(CLASS_NAME.dynamicPageContent);
         if (this.background) {
             this._setBackgroundStyles(this.background);
         }
@@ -149,34 +149,36 @@ export class DynamicPageContentComponent extends CdkScrollable implements OnInit
     // }
 
     _setBackgroundStyles(background: BACKGROUND_TYPE): any {
+        const hostElement = this._elementRef.nativeElement.querySelector('.fd-dynamic-page__content');
         switch (background) {
             case 'transparent':
-                this._addClassNameToHostElement(CLASS_NAME.dynamicPageContentTransparentBg);
+                this._addClassNameToHostElement(hostElement, CLASS_NAME.dynamicPageContentTransparentBg);
                 break;
             case 'list':
-                this._addClassNameToHostElement(CLASS_NAME.dynamicPageContentListBg);
+                this._addClassNameToHostElement(hostElement, CLASS_NAME.dynamicPageContentListBg);
                 break;
             case 'solid':
             default:
-                this._removeClassNameToHostElement(CLASS_NAME.dynamicPageContentTransparentBg);
-                this._removeClassNameToHostElement(CLASS_NAME.dynamicPageContentListBg);
+                this._removeClassNameToHostElement(hostElement, CLASS_NAME.dynamicPageContentTransparentBg);
+                this._removeClassNameToHostElement(hostElement, CLASS_NAME.dynamicPageContentListBg);
                 break;
         }
     }
     _setSize(sizeType: RESPONSIVE_SIZE): any {
+        const hostElement = this._elementRef.nativeElement.querySelector('.fd-dynamic-page__content');
         switch (sizeType) {
             case 'small':
-                this._addClassNameToHostElement(CLASS_NAME.dynamicPageContentAreaSmall);
+                this._addClassNameToHostElement(hostElement, CLASS_NAME.dynamicPageContentAreaSmall);
                 break;
             case 'medium':
-                this._addClassNameToHostElement(CLASS_NAME.dynamicPageContentAreaMedium);
+                this._addClassNameToHostElement(hostElement, CLASS_NAME.dynamicPageContentAreaMedium);
                 break;
             case 'large':
-                this._addClassNameToHostElement(CLASS_NAME.dynamicPageContentAreaLarge);
+                this._addClassNameToHostElement(hostElement, CLASS_NAME.dynamicPageContentAreaLarge);
                 break;
             case 'extra-large':
             default:
-                this._addClassNameToHostElement(CLASS_NAME.dynamicPageContentAreaExtraLarge);
+                this._addClassNameToHostElement(hostElement, CLASS_NAME.dynamicPageContentAreaExtraLarge);
                 break;
         }
     }
@@ -266,11 +268,11 @@ export class DynamicPageContentComponent extends CdkScrollable implements OnInit
         this.scrollDispatcher.deregister(this.cdkScrollable);
     }
     /**@hidden */
-    protected _addClassNameToHostElement(className: string): void {
+    protected _addClassNameToHostElement(element: Element, className: string): void {
         this._renderer.addClass(this._elementRef.nativeElement, className);
     }
     /**@hidden */
-    protected _removeClassNameToHostElement(className: string): void {
+    protected _removeClassNameToHostElement(element: Element, className: string): void {
         this._renderer.removeClass(this._elementRef.nativeElement, className);
     }
     /**@hidden */

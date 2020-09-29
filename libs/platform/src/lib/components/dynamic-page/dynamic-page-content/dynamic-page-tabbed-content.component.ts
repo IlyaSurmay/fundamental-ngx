@@ -1,29 +1,23 @@
+import { CdkScrollable, ScrollDispatcher } from '@angular/cdk/scrolling';
 import {
-    Component,
-    OnInit,
     ChangeDetectionStrategy,
+    Component,
     ElementRef,
-    Renderer2,
     forwardRef,
-    Input,
-    ViewChild,
-    AfterViewInit,
     NgZone,
+    Renderer2,
+    ViewChild,
+    Input,
+    AfterViewInit,
     ContentChild,
-    TemplateRef,
-    HostBinding,
-    HostListener
+    AfterContentInit
 } from '@angular/core';
-
-import { CLASS_NAME, DYNAMIC_PAGE_CHILD_TOKEN } from '../constants';
-import { ScrollDispatcher, CdkScrollable } from '@angular/cdk/scrolling';
+import { DYNAMIC_PAGE_CHILD_TOKEN, BACKGROUND_TYPE, RESPONSIVE_SIZE, CLASS_NAME } from '../constants';
 import { DynamicPageService } from '../dynamic-page.service';
-import { TabPanelComponent } from '@fundamental-ngx/core';
-import { DynamicPageContentComponent } from './dynamic-page-content.component';
 
 @Component({
     selector: 'fdp-dynamic-page-tabbed-content',
-    template: `<ng-template><ng-content></ng-content></ng-template>`,
+    template: '<div class="fd-dynamic-page__content"><ng-content></ng-content></div>',
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         {
@@ -32,161 +26,98 @@ import { DynamicPageContentComponent } from './dynamic-page-content.component';
         }
     ]
 })
-export class DynamicPageTabbedContentComponent extends CdkScrollable implements OnInit, AfterViewInit {
-    // @Input()
-    // tabLabel: string;
-
+export class DynamicPageTabbedContentComponent extends CdkScrollable {
     @ViewChild(CdkScrollable)
     cdkScrollable: CdkScrollable;
 
-    toggledVal = false;
+    _background: BACKGROUND_TYPE;
 
-    @ViewChild('dynPage')
-    dynPage: ElementRef;
-    isVisible = true;
+    @Input()
+    set background(backgroundType: BACKGROUND_TYPE) {
+        if (backgroundType) {
+            this._background = backgroundType;
+            this._setBackgroundStyles(backgroundType);
+        }
+    }
 
-    /** @hidden */
-    @ViewChild(TemplateRef)
-    contentTemplateRef: TemplateRef<any>;
+    get background(): BACKGROUND_TYPE {
+        return this._background;
+    }
+    _size: RESPONSIVE_SIZE;
 
-    @ContentChild(DynamicPageContentComponent)
-    tabPanelContent: DynamicPageContentComponent;
+    @Input()
+    set size(sizeType: RESPONSIVE_SIZE) {
+        if (sizeType) {
+            this._size = sizeType;
+            this._setSize(sizeType);
+        }
+    }
+
+    get size(): RESPONSIVE_SIZE {
+        return this._size;
+    }
 
     constructor(
-        private _elementRef: ElementRef<HTMLElement>,
-        private _renderer: Renderer2,
+        public _elementRef: ElementRef<HTMLElement>,
+        public _renderer: Renderer2,
         public scrollDispatcher: ScrollDispatcher,
-        private zone: NgZone,
-        private _dynamicPageService: DynamicPageService
+        public zone: NgZone,
+        public _dynamicPageService: DynamicPageService
     ) {
         super(_elementRef, scrollDispatcher, zone);
-        // this._setAttributeToHostElement('cdkScrollable', '');
-        // this.scrollDispatcher.register(this.scrollable);
-        this._dynamicPageService.$toggle.subscribe((val) => {
-            console.log('subscriibied to dyn page serviicee in content' + val);
-            this.toggledVal = val;
-        });
-        // this.scrollDispatcher.scrolled().subscribe((cdk: CdkScrollable) => {
-        //     this.zone.run(() => {
-        //         // Your update here!
-        //         console.log('scrolled from ' + cdk.getElementRef().nativeElement.innerHTML);
-        //         // improperly used, currently detecting doc scroll.
-        //         // this._dynamicPageService.toggleHeader(!this.toggledVal);
-        //     });
-        // });
-    }
-
-    ngOnInit(): void {
         // this._addClassNameToHostElement(CLASS_NAME.dynamicPageContent);
-        // this._addClassNameToHostElement(CLASS_NAME.dynamicPageContentExtraLarge);
-        // if (this.tabLabel) {
-        // add tabbed content
-        // todo add to the fd-tab class properly
-        // this._addClassNameToHostElement(CLASS_NAME.dynamicPageTabs);
-        this._removeClassNameToHostElement(CLASS_NAME.dynamicPageContent);
-        // this._addClassNameToHostElement(CLASS_NAME.dynamicPageTabsExtraLarge);
-        // this._removeClassNameToHostElement(CLASS_NAME.dynamicPageContentExtraLarge);
-
-        // this._setStyleToHostElement('overflow', 'scroll');
-        // }
     }
 
-    ngAfterViewInit(): void {
-        // this.scrollDispatcher.register(this.cdkScrollable);
-        // console.log('has?' + this.scrollDispatcher.scrollContainers.has(this.cdkScrollable));
-        // this.scrollDispatcher.scrolled(100).subscribe((cdk: CdkScrollable) => {
-        //     this.zone.run(() => {
-        //         // Your update here!
-        //         console.log('scrolled' + cdk);
-        //         // improperly used, currently detecting doc scroll.
-        //         const scrollPosition = cdk.getElementRef().nativeElement.scrollTop;
-        //         console.log(scrollPosition);
-        //         this._dynamicPageService.toggleHeader(!this.toggledVal);
-        //     });
-        // });
-        // this.scrollDispatcher.
-        // this.scrollDispatcher.scrolled().subscribe((cdk: CdkScrollable) => {
-        //     this.zone.run(() => {
-        //         // Your update here!
-        //         console.log('scrolled');
-        //     });
-        // });
-        // this.scrollable.elementScrolled().subscribe((scrolled) => console.log('scrolled', scrolled));
-        // this.scrollable.elementScrolled().subscribe((scrolled) => {
-        //     this.zone.run(() => {
-        //         // Your update here!
-        //         console.log('scrolled');
-        //         // improperly used, currently detecting doc scroll.
-        //     });
-        // });
-        console.log('in after viieiw');
-        // const scroll$ = fromEvent(window, 'scroll').pipe(
-        //     throttleTime(10),
-        //     map(() => window.pageYOffset),
-        //     pairwise(),
-        //     map(([y1, y2]): Direction => (y2 < y1 ? Direction.Up : Direction.Down)),
-        //     distinctUntilChanged(),
-        //     share()
-        // );
-
-        // const scrollUp$ = scroll$.pipe(filter((direction) => direction === Direction.Up));
-
-        // const scrollDown = scroll$.pipe(filter((direction) => direction === Direction.Down));
-
-        // scrollUp$.subscribe(() => {
-        //     console.log('UPPPP');
-        //     this.isVisible = true;
-        //     this._dynamicPageService.toggleHeader(!this.toggledVal);
-        // });
-        // scrollDown.subscribe(() => (this.isVisible = false));
-
-        // this works in parent scroll
-        // this.zone.run(() => {
-        //     const content = document.querySelector('.fd-dynamic-page__content');
-
-        //     const scroll$ = fromEvent(content, 'scroll').pipe(
-        //         throttleTime(10),
-        //         map(() => content.scrollTop),
-        //         pairwise(),
-        //         map(([y1, y2]): Direction => (y2 < y1 ? Direction.Up : Direction.Down)),
-        //         distinctUntilChanged(),
-        //         share()
-        //     );
-        //     const scrollUp$ = scroll$.pipe(filter((direction) => direction === Direction.Up));
-        //     const scrollDown$ = scroll$.pipe(filter((direction) => direction === Direction.Down));
-        //     scrollUp$.subscribe(() => {
-        //         console.log('UPPPP');
-        //         this.isVisible = true;
-        //         this._dynamicPageService.toggleHeader(!this.toggledVal);
-        //     });
-        //     scrollDown$.subscribe(() => (this.isVisible = false));
-        //     console.log(scroll$);
-        // });
+    _setBackgroundStyles(background: BACKGROUND_TYPE): any {
+        const hostElement = this._elementRef.nativeElement.querySelector('.fd-dynamic-page__content');
+        switch (background) {
+            case 'transparent':
+                this._addClassNameToHostElement(hostElement, CLASS_NAME.dynamicPageContentTransparentBg);
+                break;
+            case 'list':
+                this._addClassNameToHostElement(hostElement, CLASS_NAME.dynamicPageContentListBg);
+                break;
+            case 'solid':
+            default:
+                this._removeClassNameToHostElement(hostElement, CLASS_NAME.dynamicPageContentTransparentBg);
+                this._removeClassNameToHostElement(hostElement, CLASS_NAME.dynamicPageContentListBg);
+                break;
+        }
     }
-    // @HostBinding('@toggle')
-    // get toggle(): VisibilityState {
-    //     return this.isVisible ? VisibilityState.Visible : VisibilityState.Hidden;
-    // }
+    _setSize(sizeType: RESPONSIVE_SIZE): any {
+        const hostElement = this._elementRef.nativeElement.querySelector('.fd-dynamic-page__content');
 
-    // @HostListener('scroll', ['$event'])
-    // onElementScroll($event): void {
-    //     console.log('scrollinig');
-    // }
+        switch (sizeType) {
+            case 'small':
+                this._addClassNameToHostElement(hostElement, CLASS_NAME.dynamicPageContentAreaSmall);
+                break;
+            case 'medium':
+                this._addClassNameToHostElement(hostElement, CLASS_NAME.dynamicPageContentAreaMedium);
+                break;
+            case 'large':
+                this._addClassNameToHostElement(hostElement, CLASS_NAME.dynamicPageContentAreaLarge);
+                break;
+            case 'extra-large':
+            default:
+                this._addClassNameToHostElement(hostElement, CLASS_NAME.dynamicPageContentAreaExtraLarge);
+                break;
+        }
+    }
 
     /**@hidden */
-    private _addClassNameToHostElement(className: string): void {
-        this._renderer.addClass(this._elementRef.nativeElement, className);
+    protected _addClassNameToHostElement(element: Element, className: string): void {
+        this._renderer.addClass(element, className);
     }
     /**@hidden */
-    private _removeClassNameToHostElement(className: string): void {
+    protected _removeClassNameToHostElement(element: Element, className: string): void {
         this._renderer.removeClass(this._elementRef.nativeElement, className);
     }
     /**@hidden */
-    private _setAttributeToHostElement(attribute: string, value: any): void {
+    protected _setAttributeToHostElement(attribute: string, value: any): void {
         this._renderer.setAttribute(this._elementRef.nativeElement, attribute, value);
     }
     /**@hidden */
-    private _setStyleToHostElement(attribute: string, value: any): void {
+    protected _setStyleToHostElement(attribute: string, value: any): void {
         this._renderer.setStyle(this._elementRef.nativeElement, attribute, value);
     }
 }

@@ -7,16 +7,23 @@ import { PlatformConfig } from '../../platform.config';
 @Injectable({ providedIn: 'root' })
 export class DynamicPageConfig {
     /**
-     * ARIA label for button when the Dynamic Page is collapsed
+     * aria label for expand/collapse button when the Dynamic Page is collapsed
      */
     expandLabel = 'Expand Header';
 
     /**
-     * ARIA label for button when the Panel is expanded
+     * aria label for expand/collapse button when the Dynamic Page is expanded
      */
     collapseLabel = 'Collapse Header';
 
+    /**
+     * aria label for pin button when the Dynamic Page should be pinned
+     */
     pinLabel = 'Pin Header';
+
+    /**
+     * aria label for pin button when the Panel should be unpinned
+     */
     unpinLabel = 'Unpin Header';
 
     /**
