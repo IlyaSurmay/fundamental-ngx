@@ -69,5 +69,6 @@ export const API_FILES = {
         'ListGroupHeader',
         'ListHeader',
         'ListConfig'
-    ]
+    ],
+    approvalFlow: ['PlatformApprovalFlowComponent']
 };

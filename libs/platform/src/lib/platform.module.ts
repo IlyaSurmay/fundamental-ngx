@@ -27,6 +27,7 @@ import { PlatformObjectMarkerModule } from './components/object-marker/object-ma
 import { PlatformObjectAttributeModule } from './components/object-attribute/object-attribute.module';
 import { PlatformTableModule } from './components/table/table.module';
 import { PlatformDatetimePickerModule } from './components/form/datetime-picker/datetime-picker.module';
+import { PlatformApprovalFlowModule } from './components/approval-flow/approval-flow.module';
 
 @NgModule({
     imports: [CommonModule, FundamentalNgxCoreModule],
@@ -59,7 +60,8 @@ import { PlatformDatetimePickerModule } from './components/form/datetime-picker/
         PlatformObjectMarkerModule,
         PlatformObjectAttributeModule,
         PlatformTableModule,
-        PlatformDatetimePickerModule
+        PlatformDatetimePickerModule,
+        PlatformApprovalFlowModule
     ]
 })
 export class FundamentalNgxPlatformModule {}
