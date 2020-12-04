@@ -74,5 +74,5 @@ export const API_FILES = {
     feedInput: ['FeedInputComponent'],
     fileUploader: ['PlatformFileUploaderComponent'],
     uploadCollection: ['UploadCollectionComponent', 'UploadCollectionDataProvider', 'UploadCollectionDataSource'],
-    approvalFlow: ['PlatformApprovalFlowComponent']
+    approvalFlow: ['ApprovalFlowComponent', 'ApprovalFlowNodeComponent']
 };
